@@ -1,0 +1,12 @@
+{
+  "settings": "Settings",
+  "light": "light",
+  "dark": "dark",
+  "system": "system",
+  "dont": "Don't have an account? Sign Up",
+  "already": "Already have an account? Log In",
+  "404": "the page is not exist",
+  "ourSystem": "legal communication system",
+  "helloSystem": "Welcome to our website , we have what you need",
+  "findYour": "find your layer"
+}
