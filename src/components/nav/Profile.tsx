@@ -43,10 +43,12 @@ export default function AccountCustomSlotProps() {
           slotProps={{
             signInButton: {
               color: 'success',
+              disabled: true, // Disable the sign-in button
             },
             signOutButton: {
-              color: 'success',
+              color: 'error',
               startIcon: <Logout />,
+              onClick: authentication.signOut, // Trigger the signOut function on click
             },
             preview: {
               variant: 'expanded',

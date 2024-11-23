@@ -28,34 +28,100 @@ export default function SliderKeyboardControl() {
         className="mySwiperKeyboard"
         onSlideChange={(swiper) => setActiveIndex(swiper.activeIndex)}
       >
-        <SwiperSlide className="sliderFade flex items-center justify-between text-white">
-          <div className="infoSlide w-[50%] mx-5">
-            <h2 className="capitalize text-4xl text-[var(--clr-product)] my-4">
-              {t("ourSystem")}
-            </h2>
-            <p className="capitalize text-2xl">
-              <Typewriter
-                words={[t("helloSystem")]}
-                loop={Infinity}
-                cursor
-                cursorStyle="|"
-                typeSpeed={70}
-                deleteSpeed={50}
-                delaySpeed={1000}
-              />
-            </p>
+        <SwiperSlide className="sliderFade  text-white">
+          <div className="flex items-center justify-between container mx-auto">
+            <div className="infoSlide w-[50%] mx-5">
+              <h2 className="capitalize text-4xl text-[var(--clr-product)] my-4 font-bold">
+                {t("ourSystem")}
+              </h2>
+              <p className="capitalize text-2xl">
+                <Typewriter
+                  words={[t("helloSystem")]}
+                  loop={Infinity}
+                  cursor
+                  cursorStyle="|"
+                  typeSpeed={70}
+                  deleteSpeed={50}
+                  delaySpeed={1000}
+                />
+              </p>
+            </div>
+            {/* Replace div with MUI Button */}
+            <div className="mx-5 flex-1 text-center">
+              <Button
+                variant="contained" // Style the button as a contained button
+                color="primary" // Choose the color of the button
+                size="large" // Set the size of the button
+                onClick={() => console.log("Button clicked")} // You can handle the button click here
+                sx={{ width: "100%" }}
+              >
+                {t("findYour")}
+              </Button>
+            </div>
           </div>
-          {/* Replace div with MUI Button */}
-          <div className="mx-5 flex-1 text-center">
-            <Button
-              variant="contained" // Style the button as a contained button
-              color="primary" // Choose the color of the button
-              size="large" // Set the size of the button
-              onClick={() => console.log("Button clicked")} // You can handle the button click here
-                sx={{width:"100%"}}
-            >
-              {t("findYour")}
-            </Button>
+        </SwiperSlide>
+        <SwiperSlide className="sliderFade  text-white">
+          <div className="flex items-center justify-between container mx-auto">
+            <div className="infoSlide w-[50%] mx-5">
+              <h2 className="capitalize text-4xl text-[var(--clr-product)] my-4 font-bold">
+                {t("ourSystem")}
+              </h2>
+              <p className="capitalize text-2xl">
+                <Typewriter
+                  words={[t("helloSystem")]}
+                  loop={Infinity}
+                  cursor
+                  cursorStyle="|"
+                  typeSpeed={70}
+                  deleteSpeed={50}
+                  delaySpeed={1000}
+                />
+              </p>
+            </div>
+            {/* Replace div with MUI Button */}
+            <div className="mx-5 flex-1 text-center">
+              <Button
+                variant="contained" // Style the button as a contained button
+                color="primary" // Choose the color of the button
+                size="large" // Set the size of the button
+                onClick={() => console.log("Button clicked")} // You can handle the button click here
+                sx={{ width: "100%" }}
+              >
+                {t("findYour")}
+              </Button>
+            </div>
+          </div>
+        </SwiperSlide>
+        <SwiperSlide className="sliderFade  text-white">
+          <div className="flex items-center justify-between container mx-auto">
+            <div className="infoSlide w-[50%] mx-5">
+              <h2 className="capitalize text-4xl text-[var(--clr-product)] my-4 font-bold">
+                {t("ourSystem")}
+              </h2>
+              <p className="capitalize text-2xl">
+                <Typewriter
+                  words={[t("helloSystem")]}
+                  loop={Infinity}
+                  cursor
+                  cursorStyle="|"
+                  typeSpeed={70}
+                  deleteSpeed={50}
+                  delaySpeed={1000}
+                />
+              </p>
+            </div>
+            {/* Replace div with MUI Button */}
+            <div className="mx-5 flex-1 text-center">
+              <Button
+                variant="contained" // Style the button as a contained button
+                color="primary" // Choose the color of the button
+                size="large" // Set the size of the button
+                onClick={() => console.log("Button clicked")} // You can handle the button click here
+                sx={{ width: "100%" }}
+              >
+                {t("findYour")}
+              </Button>
+            </div>
           </div>
         </SwiperSlide>
         <div className="custom-pagination text-center relative"></div>

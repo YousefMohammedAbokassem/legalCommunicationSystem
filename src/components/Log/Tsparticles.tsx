@@ -37,7 +37,7 @@ const Tsparticles = () => {
     () => ({
       background: {
         color: {
-          value: "#3C5861",
+          value: "#1d4c6a",
         },
       },
       fpsLimit: 190,
@@ -80,14 +80,14 @@ const Tsparticles = () => {
             default: OutMode.out,
           },
           random: false,
-          speed: 6,
+          speed: 2,
           straight: false,
         },
         number: {
           density: {
             enable: true,
           },
-          value: 160,
+          value: 60,
         },
         opacity: {
           value: 0.5,

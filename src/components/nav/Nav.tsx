@@ -1,230 +1,328 @@
-import * as React from "react";
-import Profile from "./Profile";
-import { styled, alpha } from "@mui/material/styles";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import InputBase from "@mui/material/InputBase";
-import Badge from "@mui/material/Badge";
-import MenuItem from "@mui/material/MenuItem";
-import Menu from "@mui/material/Menu";
-import MenuIcon from "@mui/icons-material/Menu";
-import SearchIcon from "@mui/icons-material/Search";
-import AccountCircle from "@mui/icons-material/AccountCircle";
-import MailIcon from "@mui/icons-material/Mail";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import MoreIcon from "@mui/icons-material/MoreVert";
+import React, { useEffect, useState } from "react";
+import {
+  AppBar,
+  Toolbar,
+  IconButton,
+  Box,
+  Typography,
+  Avatar,
+  Popover,
+  MenuItem,
+  CircularProgress,
+  Button,
+  Drawer,
+  TextField,
+  Dialog,
+  DialogTitle,
+  DialogActions,
+  DialogContent,
+} from "@mui/material";
+import { logoutUser } from "../../store/slices/auth/authSlice";
+import { useDispatch } from "react-redux";
+import axios from "axios";
+import { useNavigate, Link } from "react-router-dom";
 
-const Search = styled("div")(({ theme }) => ({
-  position: "relative",
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  "&:hover": {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
-  marginRight: theme.spacing(2),
-  marginLeft: 0,
-  width: "100%",
-  [theme.breakpoints.up("sm")]: {
-    marginLeft: theme.spacing(3),
-    width: "auto",
-  },
-}));
+export default function CustomNavBar() {
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [loadingSignOut, setLoadingSignOut] = useState(false);
+  const [loadingDelete, setLoadingDelete] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loadingChange, setLoadingChange] = useState(false);
+  const [loadProfile, setLoadProfile] = useState(false);
+  const [profileData, setProfileData] = useState([]);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-const SearchIconWrapper = styled("div")(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: "100%",
-  position: "absolute",
-  pointerEvents: "none",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: "inherit",
-  "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 0),
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create("width"),
-    width: "100%",
-    [theme.breakpoints.up("md")]: {
-      width: "20ch",
-    },
-  },
-}));
-
-export default function PrimarySearchAppBar() {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
-    React.useState<null | HTMLElement>(null);
-
-  const isMenuOpen = Boolean(anchorEl);
-  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
-
-  const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+  const handleProfileClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleMobileMenuClose = () => {
-    setMobileMoreAnchorEl(null);
-  };
-
-  const handleMenuClose = () => {
+  const handleClose = () => {
     setAnchorEl(null);
-    handleMobileMenuClose();
   };
 
-  const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setMobileMoreAnchorEl(event.currentTarget);
+  const logOut = async () => {
+    setLoadingSignOut(true);
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}v1/users/auth/signout`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+      dispatch(logoutUser());
+      navigate("/SignIn");
+    } catch (error) {
+      console.error(error);
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        dispatch(logoutUser());
+        navigate("/SignIn");
+      }
+    } finally {
+      setLoadingSignOut(false);
+    }
   };
 
-  const menuId = "primary-search-account-menu";
-  const renderMenu = (
-    <Menu
-      anchorEl={anchorEl}
-      anchorOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
-      id={menuId}
-      keepMounted
-      transformOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
-      open={isMenuOpen}
-      onClose={handleMenuClose}
-    >
-      <MenuItem onClick={handleMenuClose}>asd</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
-      <MenuItem onClick={handleMenuClose}>Settings</MenuItem>{" "}
-      {/* Add Settings Option */}
-    </Menu>
-  );
+  const handleChangePassword = async () => {
+    setLoadingChange(true);
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}v1/users/change-password`,
+        {
+          current_password: currentPassword,
+          new_password: newPassword,
+          new_password_confirmation: confirmPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+      setDrawerOpen(false);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoadingChange(false);
+    }
+  };
 
-  const mobileMenuId = "primary-search-account-menu-mobile";
-  const renderMobileMenu = (
-    <Menu
-      anchorEl={mobileMoreAnchorEl}
-      anchorOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
-      id={mobileMenuId}
-      keepMounted
-      transformOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
-      open={isMobileMenuOpen}
-      onClose={handleMobileMenuClose}
-    >
-      <MenuItem>
-        <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-          <Badge badgeContent={4} color="error">
-            <MailIcon />
-          </Badge>
-        </IconButton>
-        <p>Messages</p>
-      </MenuItem>
-      <MenuItem>
-        <IconButton
-          size="large"
-          aria-label="show 17 new notifications"
-          color="inherit"
-        >
-          <Badge badgeContent={17} color="error">
-            <NotificationsIcon />
-          </Badge>
-        </IconButton>
-        <p>Notifications</p>
-      </MenuItem>
-      <MenuItem onClick={handleProfileMenuOpen}>
-        <IconButton
-          size="large"
-          aria-label="account of current user"
-          aria-controls="primary-search-account-menu"
-          aria-haspopup="true"
-          color="inherit"
-        >
-          <AccountCircle />
-        </IconButton>
-        <p>Profile</p>
-      </MenuItem>
-    </Menu>
-  );
+  const fetchProfile = async () => {
+    setLoadProfile(true);
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}v1/users/profile`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+      setProfileData(res?.data?.profile || {});
+    } catch (error) {
+      console.error(error);
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        dispatch(logoutUser());
+        navigate("/SignIn");
+      }
+    } finally {
+      setLoadProfile(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const deleteAccount = async () => {
+    setLoadingDelete(true);
+    try {
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL}v1/users/${profileData?.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+      dispatch(logoutUser());
+      navigate("/SignIn");
+    } catch (error) {
+      console.error("Error deleting account:", error);
+    } finally {
+      setLoadingDelete(false);
+      setDialogOpen(false);
+    }
+  };
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
+      <AppBar
+        position="static"
+        sx={{
+          background: "linear-gradient(to right, #1d4c6a, #8faabf)",
+          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
+        }}
+      >
         <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            sx={{ mr: 2 }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            sx={{ display: { xs: "none", sm: "block" } }}
-          >
-            MUI
-          </Typography>
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ "aria-label": "search" }}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <img
+              src="/balance.jpg"
+              alt="Logo"
+              style={{ width: "40px", height: "40px", borderRadius: "50%" }}
             />
-          </Search>
+            <Typography
+              variant="h6"
+              sx={{ fontWeight: "bold", color: "#ffffff" }}
+            >
+              Balance
+            </Typography>
+          </Box>
           <Box sx={{ flexGrow: 1 }} />
-          <Box sx={{ display: { xs: "none", md: "flex" } }}>
-            <IconButton
-              size="large"
-              aria-label="show 4 new mails"
-              color="inherit"
-            >
-              <Badge badgeContent={4} color="error">
-                <MailIcon />
-              </Badge>
-            </IconButton>
-            <IconButton
-              size="large"
-              aria-label="show 17 new notifications"
-              color="inherit"
-            >
-              <Badge badgeContent={17} color="error">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
-            <Profile />
+          <Box sx={{ display: "flex", gap: 3 }}>
+            {["Home", "Lawyers", "الوكالات", "من نحن"].map((label, index) => (
+              <Link
+                key={index}
+                to={`/${label.toLowerCase()}`}
+                style={{ textDecoration: "none" }}
+              >
+                <Button
+                  sx={{
+                    color: "#ffffff",
+                    textTransform: "none",
+                    fontWeight: "500",
+                    "&:hover": {
+                      color: "#fff",
+                      backgroundColor: "rgba(255, 255, 255, 0.1)",
+                    },
+                  }}
+                >
+                  {label}
+                </Button>
+              </Link>
+            ))}
           </Box>
-          <Box sx={{ display: { xs: "flex", md: "none" } }}>
-            <IconButton
-              size="large"
-              aria-label="show more"
-              aria-controls={mobileMenuId}
-              aria-haspopup="true"
-              onClick={handleMobileMenuOpen}
-              color="inherit"
-            >
-              <MoreIcon />
-            </IconButton>
-          </Box>
+          <IconButton onClick={handleProfileClick}>
+            <Avatar
+              alt="User Profile"
+              src="/path/to/profile-image.jpg"
+              sx={{ border: "2px solid #ffffff" }}
+            />
+          </IconButton>
         </Toolbar>
       </AppBar>
-      {renderMobileMenu}
-      {renderMenu}
+
+      <Popover
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+        sx={{
+          "& .MuiPaper-root": {
+            borderRadius: "10px",
+            padding: "10px",
+            minWidth: "200px",
+            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
+          },
+        }}
+      >
+        <MenuItem
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 1,
+            textAlign: "center",
+          }}
+        >
+          {loadProfile ? (
+            <CircularProgress size={20} />
+          ) : (
+            <>
+              <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                {profileData?.name || "Guest"}
+              </Typography>
+              <Typography variant="body2" sx={{ color: "gray" }}>
+                {profileData?.email || "No Email Available"}
+              </Typography>
+            </>
+          )}
+        </MenuItem>
+        <MenuItem onClick={() => setDrawerOpen(true)}>Change Password</MenuItem>
+        <MenuItem>
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={logOut}
+            disabled={loadingSignOut}
+            sx={{ textTransform: "none", fontWeight: "500" }}
+          >
+            {loadingSignOut && <CircularProgress size={20} color="inherit" />}{" "}
+            Sign Out
+          </Button>
+        </MenuItem>
+        <MenuItem>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => setDialogOpen(true)}
+            disabled={loadingDelete}
+            sx={{ textTransform: "none", fontWeight: "500" }}
+          >
+            {loadingDelete && <CircularProgress size={20} color="inherit" />}{" "}
+            Delete Account
+          </Button>
+        </MenuItem>
+      </Popover>
+
+      <Drawer
+        anchor="right"
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+      >
+        <Box sx={{ width: 300, padding: 2 }}>
+          <Typography variant="h6" sx={{ marginBottom: 2 }}>
+            Change Password
+          </Typography>
+          <TextField
+            label="Current Password"
+            type="password"
+            fullWidth
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            sx={{ marginBottom: 2 }}
+          />
+          <TextField
+            label="New Password"
+            type="password"
+            fullWidth
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            sx={{ marginBottom: 2 }}
+          />
+          <TextField
+            label="Confirm New Password"
+            type="password"
+            fullWidth
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            sx={{ marginBottom: 2 }}
+          />
+          <Button
+            variant="contained"
+            onClick={handleChangePassword}
+            fullWidth
+            disabled={loadingChange}
+          >
+            {loadingChange ? <CircularProgress size={20} /> : "Change Password"}
+          </Button>
+        </Box>
+      </Drawer>
+
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
+        <DialogTitle>Confirm Account Deletion</DialogTitle>
+        <DialogActions>
+          <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
+          <Button
+            color="error"
+            variant="contained"
+            onClick={deleteAccount}
+            disabled={loadingDelete}
+          >
+            {loadingDelete ? <CircularProgress size={20} /> : "Delete Account"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

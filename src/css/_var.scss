@@ -17,7 +17,8 @@
     /* body */
     --clr-secondary: #f4f4f4;
     /* color main */
-    --clr-product: #3C5861;
+    // --clr-product: #3C5861;
+    --clr-product: #1d4c6a;
     --text-color: #111;
     --top: 50%;
     --left: 50%;
@@ -31,7 +32,8 @@
     /* body */
     --clr-secondary: #1e1611;
     /* color main */
-    --clr-product: #3C5861;
+    --clr-product: #1d4c6a;
+    // --clr-product: #3C5861;
     --text-color: #fff;
     --top: 50%;
     --left: 50%;
@@ -214,7 +216,8 @@ $them: "dark";
 // zic
 // shadow
 @mixin shadow {
-  box-shadow: 0px 12px 20px 0px rgba(black, 0.13),
+  box-shadow:
+    0px 12px 20px 0px rgba(black, 0.13),
     0px 2px 4px 0px rgba(black, 0.12);
 }
 // shadow

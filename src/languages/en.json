@@ -4,9 +4,18 @@
   "dark": "dark",
   "system": "system",
   "dont": "Don't have an account? Sign Up",
-  "already": "Already have an account? Log In",
+  "already": "Already have an account? Sign In",
   "404": "the page is not exist",
   "ourSystem": "legal communication system",
-  "helloSystem": "Welcome to our website , we have what you need",
-  "findYour": "find your layer"
+  "helloSystem": "Welcome to the legal communication system, where we combine experience and passion to achieve excellence. We are a distinguished team that seeks to provide innovative solutions in the field of information technology, committed to providing the highest levels of quality and service to our customers.",
+  "findYour": "find your layer",
+  "review": "Review from our guests",
+  "ourServices": "Our Services",
+  "union": "Union Branch",
+  "yearsOf": "Years Of Experience",
+  "pageOfLawer": "Go to lawer's page",
+  "year": "Years",
+  "legalSystemWho": "Welcome to the legal communication system, where we combine experience and passion to achieve excellence. We are a distinguished team that seeks to provide innovative solutions in the field of information technology, committed to providing the highest levels of quality and service to our customers.",
+  "legalSystem": "Legal System Communication",
+  "aboutUs": "About Us"
 }

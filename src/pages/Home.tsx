@@ -1,13 +1,17 @@
 import React from "react";
-import Nav from "../components/nav/Nav";
 import Layers from "../components/layers/Layers";
 import MainSection from "../components/mainSection/MainSection";
+import OurServices from "../components/ourServices/OurServices";
+import WhoAreWe from "../components/WhoAreWe/WhoAreWe";
+import Footer from "../components/Footer/Footer";
 export default function Home() {
   return (
     <div>
-      <Nav />
       <MainSection />
       <Layers />
-    </div> 
+      <OurServices />
+      <WhoAreWe />
+      <Footer />
+    </div>
   );
 }
