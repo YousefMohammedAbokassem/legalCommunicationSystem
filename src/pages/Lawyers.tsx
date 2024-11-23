@@ -140,7 +140,7 @@ export default function Lawyers() {
                       variant="contained"
                       color="primary"
                       onClick={() => {
-                        navigate("/lawyer");
+                        navigate(`/lawyers/${lawyer?.id}`);
                       }}
                     >
                       {t("viewDetails")}

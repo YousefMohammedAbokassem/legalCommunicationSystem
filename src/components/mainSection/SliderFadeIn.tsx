@@ -36,7 +36,7 @@ export default function SliderKeyboardControl() {
               </h2>
               <p className="capitalize text-2xl">
                 <Typewriter
-                  words={[t("helloSystem")]}
+                  words={[t("ourMessage")]}
                   loop={Infinity}
                   cursor
                   cursorStyle="|"
@@ -68,7 +68,7 @@ export default function SliderKeyboardControl() {
               </h2>
               <p className="capitalize text-2xl">
                 <Typewriter
-                  words={[t("helloSystem")]}
+                  words={[t("weWork")]}
                   loop={Infinity}
                   cursor
                   cursorStyle="|"
@@ -100,7 +100,7 @@ export default function SliderKeyboardControl() {
               </h2>
               <p className="capitalize text-2xl">
                 <Typewriter
-                  words={[t("helloSystem")]}
+                  words={[t("ourView")]}
                   loop={Infinity}
                   cursor
                   cursorStyle="|"

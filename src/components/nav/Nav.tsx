@@ -167,7 +167,7 @@ export default function CustomNavBar() {
           </Box>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: "flex", gap: 3 }}>
-            {["Home", "Lawyers", "الوكالات", "من نحن"].map((label, index) => (
+            {["Home", "Lawyers", "الوكالات", "about"].map((label, index) => (
               <Link
                 key={index}
                 to={`/${label.toLowerCase()}`}
@@ -243,6 +243,7 @@ export default function CustomNavBar() {
           <Button
             variant="outlined"
             color="error"
+            fullWidth
             onClick={logOut}
             disabled={loadingSignOut}
             sx={{ textTransform: "none", fontWeight: "500" }}
@@ -255,6 +256,7 @@ export default function CustomNavBar() {
           <Button
             variant="contained"
             color="error"
+            fullWidth
             onClick={() => setDialogOpen(true)}
             disabled={loadingDelete}
             sx={{ textTransform: "none", fontWeight: "500" }}
@@ -309,20 +311,39 @@ export default function CustomNavBar() {
         </Box>
       </Drawer>
 
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
-        <DialogTitle>Confirm Account Deletion</DialogTitle>
-        <DialogActions>
-          <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
-          <Button
-            color="error"
-            variant="contained"
-            onClick={deleteAccount}
-            disabled={loadingDelete}
-          >
-            {loadingDelete ? <CircularProgress size={20} /> : "Delete Account"}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
+      <DialogTitle sx={{ fontSize: '1.25rem', fontWeight: 600, textAlign: 'center', paddingBottom: '16px' }}>
+        Confirm Account Deletion
+      </DialogTitle>
+      <DialogActions sx={{ justifyContent: 'center', paddingBottom: '16px' }}>
+        <Button
+          onClick={() => setDialogOpen(false)}
+          sx={{
+            backgroundColor: '#f0f0f0',
+            '&:hover': { backgroundColor: '#e0e0e0' },
+            borderRadius: '8px',
+            padding: '6px 16px',
+          }}
+        >
+          Cancel
+        </Button>
+        <Button
+          color="error"
+          variant="contained"
+          onClick={deleteAccount}
+          disabled={loadingDelete}
+          sx={{
+            marginLeft: '16px',
+            borderRadius: '8px',
+            padding: '6px 16px',
+            backgroundColor: '#e57373',
+            '&:hover': { backgroundColor: '#d32f2f' },
+          }}
+        >
+          {loadingDelete ? <CircularProgress size={20} color="inherit" /> : 'Delete Account'}
+        </Button>
+      </DialogActions>
+    </Dialog>
     </Box>
   );
 }
