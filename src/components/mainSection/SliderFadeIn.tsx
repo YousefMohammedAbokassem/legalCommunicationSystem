@@ -3,56 +3,60 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
 import "./styles.css";
-import { Pagination, Keyboard } from "swiper/modules";
+import { Pagination, Keyboard, Autoplay } from "swiper/modules"; // Import Autoplay module
 import { Typewriter } from "react-simple-typewriter";
 import { useTranslation } from "react-i18next";
-import { Button } from "@mui/material"; // Import MUI Button
+import { Button } from "@mui/material";
 
 export default function SliderKeyboardControl() {
-  const [t] = useTranslation();
+  const { t } = useTranslation();
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
     <>
       <Swiper
-        spaceBetween={5}
+        // spaceBetween={5}
         loop={true} // Enable infinite loop
         keyboard={{ enabled: true }} // Enable keyboard control
         navigation={true}
-        autoplay={true}
+        autoplay={{
+          delay: 10000, // Set autoplay delay to 10 seconds
+          disableOnInteraction: false, // Continue autoplay after user interaction
+        }}
         pagination={{
           clickable: true,
           el: ".custom-pagination",
         }}
-        modules={[Pagination, Keyboard]} // Include the necessary modules
+        modules={[Pagination, Keyboard, Autoplay]} // Include the Autoplay module
         className="mySwiperKeyboard"
-        onSlideChange={(swiper) => setActiveIndex(swiper.activeIndex)}
+        onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)} // Track active slide
       >
-        <SwiperSlide className="sliderFade  text-white">
+        <SwiperSlide className="sliderFade text-white">
           <div className="flex items-center justify-between container mx-auto">
             <div className="infoSlide w-[50%] mx-5">
-              <h2 className="capitalize text-4xl text-[var(--clr-product)] my-4 font-bold">
+              <h2 className="capitalize text-4xl text-white my-4 font-bold">
                 {t("ourSystem")}
               </h2>
-              <p className="capitalize text-2xl">
-                <Typewriter
-                  words={[t("ourMessage")]}
-                  loop={Infinity}
-                  cursor
-                  cursorStyle="|"
-                  typeSpeed={70}
-                  deleteSpeed={50}
-                  delaySpeed={1000}
-                />
+              <p className="capitalize text-2xl opacity-75">
+                {activeIndex === 0 && (
+                  <Typewriter
+                    words={[t("ourMessage")]}
+                    loop={Infinity}
+                    cursor
+                    cursorStyle="|"
+                    typeSpeed={70}
+                    deleteSpeed={50}
+                    delaySpeed={1000}
+                  />
+                )}
               </p>
             </div>
-            {/* Replace div with MUI Button */}
             <div className="mx-5 flex-1 text-center">
               <Button
-                variant="contained" // Style the button as a contained button
-                color="primary" // Choose the color of the button
-                size="large" // Set the size of the button
-                onClick={() => console.log("Button clicked")} // You can handle the button click here
+                variant="contained"
+                color="primary"
+                size="large"
+                onClick={() => console.log("Button clicked")}
                 sx={{ width: "100%" }}
               >
                 {t("findYour")}
@@ -60,31 +64,32 @@ export default function SliderKeyboardControl() {
             </div>
           </div>
         </SwiperSlide>
-        <SwiperSlide className="sliderFade  text-white">
+        <SwiperSlide className="sliderFade text-white">
           <div className="flex items-center justify-between container mx-auto">
             <div className="infoSlide w-[50%] mx-5">
-              <h2 className="capitalize text-4xl text-[var(--clr-product)] my-4 font-bold">
+              <h2 className="capitalize text-4xl text-white my-4 font-bold">
                 {t("ourSystem")}
               </h2>
-              <p className="capitalize text-2xl">
-                <Typewriter
-                  words={[t("weWork")]}
-                  loop={Infinity}
-                  cursor
-                  cursorStyle="|"
-                  typeSpeed={70}
-                  deleteSpeed={50}
-                  delaySpeed={1000}
-                />
+              <p className="capitalize text-2xl opacity-75">
+                {activeIndex === 1 && (
+                  <Typewriter
+                    words={[t("weWork")]}
+                    loop={Infinity}
+                    cursor
+                    cursorStyle="|"
+                    typeSpeed={70}
+                    deleteSpeed={50}
+                    delaySpeed={1000}
+                  />
+                )}
               </p>
             </div>
-            {/* Replace div with MUI Button */}
             <div className="mx-5 flex-1 text-center">
               <Button
-                variant="contained" // Style the button as a contained button
-                color="primary" // Choose the color of the button
-                size="large" // Set the size of the button
-                onClick={() => console.log("Button clicked")} // You can handle the button click here
+                variant="contained"
+                color="primary"
+                size="large"
+                onClick={() => console.log("Button clicked")}
                 sx={{ width: "100%" }}
               >
                 {t("findYour")}
@@ -92,31 +97,32 @@ export default function SliderKeyboardControl() {
             </div>
           </div>
         </SwiperSlide>
-        <SwiperSlide className="sliderFade  text-white">
+        <SwiperSlide className="sliderFade text-white">
           <div className="flex items-center justify-between container mx-auto">
             <div className="infoSlide w-[50%] mx-5">
-              <h2 className="capitalize text-4xl text-[var(--clr-product)] my-4 font-bold">
+              <h2 className="capitalize text-4xl text-white my-4 font-bold">
                 {t("ourSystem")}
               </h2>
-              <p className="capitalize text-2xl">
-                <Typewriter
-                  words={[t("ourView")]}
-                  loop={Infinity}
-                  cursor
-                  cursorStyle="|"
-                  typeSpeed={70}
-                  deleteSpeed={50}
-                  delaySpeed={1000}
-                />
+              <p className="capitalize text-2xl opacity-75">
+                {activeIndex === 2 && (
+                  <Typewriter
+                    words={[t("ourView")]}
+                    loop={Infinity}
+                    cursor
+                    cursorStyle="|"
+                    typeSpeed={70}
+                    deleteSpeed={50}
+                    delaySpeed={1000}
+                  />
+                )}
               </p>
             </div>
-            {/* Replace div with MUI Button */}
             <div className="mx-5 flex-1 text-center">
               <Button
-                variant="contained" // Style the button as a contained button
-                color="primary" // Choose the color of the button
-                size="large" // Set the size of the button
-                onClick={() => console.log("Button clicked")} // You can handle the button click here
+                variant="contained"
+                color="primary"
+                size="large"
+                onClick={() => console.log("Button clicked")}
                 sx={{ width: "100%" }}
               >
                 {t("findYour")}

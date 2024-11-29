@@ -26,7 +26,11 @@ export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [progressLog, setProgressLog] = useState(false);
-
+  const [errors, setErrors] = useState({
+    email: "",
+    password: "",
+    valid: "",
+  });
   const handleTogglePasswordVisibility = () => setShowPassword(!showPassword);
 
   const submit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
@@ -45,7 +49,26 @@ export default function SignIn() {
       localStorage.setItem("access_token", res.data.token);
       setProgressLog(false);
     } catch (error) {
-      console.error(error);
+      console.log(typeof error.response.data.error);
+      if (
+        error.response.data.error &&
+        typeof error.response.data.error === "string"
+      ) {
+        setErrors({
+          email: "",
+          password: "",
+          valid: error.response.data.error,
+        });
+      }
+      if (error.response && error.response.data && error.response.data.errors) {
+        const serverErrors = error.response.data.errors;
+        setErrors({
+          // ...prevErrors,
+          email: serverErrors.email?.[0] || "",
+          password: serverErrors.password?.[0] || "",
+          valid: "",
+        });
+      }
       setProgressLog(false);
     }
   };
@@ -56,7 +79,7 @@ export default function SignIn() {
         <div className="w-2/4">
           <div className="flex items-center gap-3 mb-4">
             <img src="/balance.jpg" alt="" className="w-14 h-14 rounded-full" />
-            <span className="text-2xl font-bold text-white">balance</span>
+            <span className="text-2xl font-bold text-white">Legal Communication</span>
           </div>
           <h1 className="mb-4 font-bold text-4xl text-white">
             {t("legalSystem")}
@@ -83,7 +106,13 @@ export default function SignIn() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 margin="normal"
+                error={errors.email ? true : false}
               />
+              {errors.email && (
+                <Typography color="error" sx={{ fontWeight: "bold" }}>
+                  {errors.email}
+                </Typography>
+              )}
             </Grid>
             <Grid item xs={12}>
               <TextField
@@ -102,7 +131,18 @@ export default function SignIn() {
                   ),
                 }}
                 fullWidth
+                error={errors.password ? true : false}
               />
+              {errors.password && (
+                <Typography color="error" sx={{ fontWeight: "bold" }}>
+                  {errors.password}
+                </Typography>
+              )}
+              {errors.valid && (
+                <Typography color="error" sx={{ fontWeight: "bold" }}>
+                  {errors.valid}
+                </Typography>
+              )}
             </Grid>
           </Grid>
           <Button
@@ -131,7 +171,7 @@ export default function SignIn() {
           </Typography>
         </Box>
       </div>
-      <Tsparticles />
+      {/* <Tsparticles /> */}
     </>
   );
 }

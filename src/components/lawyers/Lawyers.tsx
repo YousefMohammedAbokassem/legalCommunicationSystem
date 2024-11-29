@@ -50,7 +50,7 @@ const ReviewSection = () => {
             <div className="flex justify-center items-center gap-2 ">
               <img
                 className="w-[50px] h-[50px] rounded-full"
-                src="/mylogo.jpg"
+                src="/me.jpg"
                 alt="Guest 1"
               />
               <h3 className="text-[var(--clr-product)] font-bold">

@@ -10,7 +10,7 @@ export default function OurServices() {
       <HeaderSection text={t("aboutUs")} />
       <div className="aboutUs mx-6 text-center flex items-center justify-center gap-4">
         <img src="/avatar.jpg" alt="noImage" className="w-1/2 " />
-       <p className="text-2xl opacity-80 capitalize">
+       <p className="text-2xl opacity-60 capitalize">
         {t("legalSystemWho")}
         </p> 
       </div>

@@ -5,10 +5,10 @@
   "system": "system",
   "dont": "Don't have an account? Sign Up",
   "already": "Already have an account? Sign In",
-  "404": "the page is not exist",
+  "404": "page not found",
   "ourSystem": "legal communication system",
   "helloSystem": "Welcome to the legal communication system, where we combine experience and passion to achieve excellence. We are a distinguished team that seeks to provide innovative solutions in the field of information technology, committed to providing the highest levels of quality and service to our customers.",
-  "findYour": "find your layer",
+  "findYour": "find your lawyer",
   "review": "Review from our guests",
   "ourServices": "Our Services",
   "union": "Union Branch",
@@ -16,9 +16,13 @@
   "pageOfLawer": "Go to lawer's page",
   "year": "Years",
   "legalSystemWho": "Welcome to the legal communication system, where we combine experience and passion to achieve excellence. We are a distinguished team that seeks to provide innovative solutions in the field of information technology, committed to providing the highest levels of quality and service to our customers.",
-  "legalSystem": "Legal System Communication",
+  "legalSystem": "Legal Communication",
   "aboutUs": "About Us",
   "ourMessage": "Providing distinguished and reliable services that meet the aspirations of our customers, with a focus on innovation and continuous development.",
   "ourView": "To become leaders in the field of website development, relying on excellence and quality in everything we offer.",
-  "weWork": "We work hard to meet our customers' needs and achieve their complete satisfaction. We believe that innovation and continuous development are the key to success in today's world, and we strive to adopt the latest technologies and best practices in providing our services."
+  "weWork": "We work hard to meet our customers' needs and achieve their complete satisfaction. We believe that innovation and continuous development are the key to success in today's world, and we strive to adopt the latest technologies and best practices in providing our services.",
+  "Hiring": "Hiring lawyers",
+  "contactDirict": "contact directly with lawyers",
+  "track": "Track the status of cases"
+
 }

@@ -30,15 +30,15 @@ const Tsparticles = () => {
   }, []);
 
   const particlesLoaded = async (container?: Container): Promise<void> => {
-    console.log(container);
+    // console.log(container);
   };
 
   const options: ISourceOptions = useMemo(
     () => ({
       background: {
-        color: {
-          value: "#1d4c6a",
-        },
+        // color: {
+        //   // value: "#1d4c6a",
+        // },
       },
       fpsLimit: 190,
       interactivity: {

@@ -10,7 +10,7 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { Upload, Visibility, VisibilityOff } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { stateRedux } from "../types";
@@ -43,55 +43,109 @@ export default function SignUp() {
   const [address, setAddress] = useState("");
   const [birthdate, setBirthdate] = useState("");
   const [birth_place, setBirthPlace] = useState("");
+
   const [national_number, setNationalNumber] = useState("");
   const [phone, setPhone] = useState("");
-  const [progressLog, setprogressLog] = useState(false);
-
+  const [avatar, setAvatar]: any = useState(null); // حالة جديدة لإدارة الصورة
+  const [progressLog, setProgressLog] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const handleTogglePasswordVisibility = () => setShowPassword(!showPassword);
   const handleToggleConfirmPasswordVisibility = () =>
     setShowConfirmPassword(!showConfirmPassword);
   const handleGenderChange = (event) => setGender(event.target.value);
 
+  const handleAvatarChange = (event) => {
+    setAvatar(event.target.files[0]); // تحديث حالة الصورة
+  };
+  const [errors, setErrors] = useState({
+    username: "",
+    password: "",
+    password_confirmation: "",
+    email: "",
+    address: "",
+    birthdate: "",
+    birth_place: "",
+    national_number: "",
+    gender: "",
+    phone: "",
+    avatar: "",
+  });
   const submit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
-    setprogressLog(true);
+    e.preventDefault();
+    setProgressLog(true);
+
+    const formData = new FormData(); // استخدام FormData لإرسال البيانات
+    formData.append("name", username);
+    formData.append("password", password);
+    formData.append("password_confirmation", password_confirmation);
+    formData.append("email", email);
+    formData.append("address", address);
+    formData.append("birthdate", birthdate);
+    formData.append("birth_place", birth_place);
+    formData.append("national_number", national_number);
+    formData.append("gender", gender);
+    formData.append("phone", phone);
+    if (avatar) {
+      formData.append("avatar", avatar); // إضافة الصورة إلى FormData
+    }
+
     try {
-      e.preventDefault();
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL}v1/users/auth/signup`,
-        {
-          name: username,
-          password,
-          password_confirmation,
-          email,
-          address,
-          birthdate,
-          birth_place,
-          national_number,
-          gender,
-          phone,
-        }
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } } // تحديد نوع المحتوى
       );
       console.log(res);
       dispatch(logIn());
       localStorage.setItem("access_token", res.data.token);
-      setprogressLog(false);
+      setProgressLog(false);
     } catch (error) {
-      console.error(error);
-      setprogressLog(false);
+      if (error.response && error.response.data && error.response.data.errors) {
+        console.error(error.response.data.errors);
+        const serverErrors = error.response.data.errors;
+        setErrors({
+          // ...prevErrors,
+          username: serverErrors.name?.[0] || "",
+          password: serverErrors.password?.[0] || "",
+          password_confirmation: serverErrors.password_confirmation?.[0] || "",
+          email: serverErrors.email?.[0] || "",
+          address: serverErrors.address?.[0] || "",
+          birthdate: serverErrors.birthdate?.[0] || "",
+          birth_place: serverErrors.birth_place?.[0] || "",
+          national_number: serverErrors.national_number?.[0] || "",
+          gender: serverErrors.gender?.[0] || "",
+          phone: serverErrors.phone?.[0] || "",
+          avatar: serverErrors.avatar?.[0] || "",
+        });
+      }
+      setProgressLog(false);
+    }
+  };
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    console.log("first");
+    e.preventDefault();
+    setIsDragging(true);
+  };
+  const handleDragLeave = () => setIsDragging(false);
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+
+    const files = e.dataTransfer.files;
+    console.log(files);
+    if (files && files.length > 0) {
+      setAvatar(files[0]); // حفظ الملف
     }
   };
 
   return (
     <>
-      <div className="logInInfo  mx-auto containerLog z-10 relative">
-        <div className=" w-2/4">
+      <div className={`logInInfo mx-auto containerLog z-10 relative `}>
+        <div className="w-2/4">
           <div className="flex items-center gap-3 mb-4">
-            <img
-              src="/balance.jpg"
-              alt=""
-              className=" w-14 h-14 rounded-full"
-            />
-            <span className="text-2xl font-bold text-white">balance</span>
+            <img src="/balance.jpg" alt="" className="w-14 h-14 rounded-full" />
+            <span className="text-2xl font-bold text-white">Legal Communication</span>
           </div>
 
           <h1 className="mb-4 font-bold text-4xl text-white">
@@ -122,7 +176,13 @@ export default function SignUp() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 margin="normal"
+                error={errors.username ? true : false}
               />
+              {errors.username && (
+                <Typography color="error" sx={{ fontWeight: "bold" }}>
+                  {errors.username}
+                </Typography>
+              )}
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -132,7 +192,13 @@ export default function SignUp() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 margin="normal"
+                error={errors.email ? true : false}
               />
+              {errors.email && (
+                <Typography color="error" sx={{ fontWeight: "bold" }}>
+                  {errors.email}
+                </Typography>
+              )}
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -141,6 +207,7 @@ export default function SignUp() {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                error={errors.password ? true : false}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -152,6 +219,11 @@ export default function SignUp() {
                 }}
                 fullWidth
               />
+              {errors.password && (
+                <Typography color="error" sx={{ fontWeight: "bold" }}>
+                  {errors.password}
+                </Typography>
+              )}
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -160,6 +232,7 @@ export default function SignUp() {
                 type={showConfirmPassword ? "text" : "password"}
                 value={password_confirmation}
                 onChange={(e) => setPasswordConfirmation(e.target.value)}
+                error={errors.password ? true : false}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -177,6 +250,11 @@ export default function SignUp() {
                 }}
                 fullWidth
               />
+              {errors.password && (
+                <Typography color="error" sx={{ fontWeight: "bold" }}>
+                  {errors.password}
+                </Typography>
+              )}
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -186,7 +264,13 @@ export default function SignUp() {
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 margin="normal"
+                error={errors.address ? true : false}
               />
+              {errors.address && (
+                <Typography color="error" sx={{ fontWeight: "bold" }}>
+                  {errors.address}
+                </Typography>
+              )}
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -196,7 +280,13 @@ export default function SignUp() {
                 value={national_number}
                 onChange={(e) => setNationalNumber(e.target.value)}
                 margin="normal"
+                error={errors.national_number ? true : false}
               />
+              {errors.national_number && (
+                <Typography color="error" sx={{ fontWeight: "bold" }}>
+                  {errors.national_number}
+                </Typography>
+              )}
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -206,7 +296,13 @@ export default function SignUp() {
                 value={birth_place}
                 onChange={(e) => setBirthPlace(e.target.value)}
                 margin="normal"
+                error={errors.birth_place ? true : false}
               />
+              {errors.birth_place && (
+                <Typography color="error" sx={{ fontWeight: "bold" }}>
+                  {errors.birth_place}
+                </Typography>
+              )}
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -217,7 +313,13 @@ export default function SignUp() {
                 value={birthdate}
                 onChange={(e) => setBirthdate(e.target.value)}
                 margin="normal"
+                error={errors.birthdate ? true : false}
               />
+              {errors.birthdate && (
+                <Typography color="error" sx={{ fontWeight: "bold" }}>
+                  {errors.birthdate}
+                </Typography>
+              )}
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -227,11 +329,16 @@ export default function SignUp() {
                 onChange={handleGenderChange}
                 fullWidth
                 margin="normal"
+                error={errors.gender ? true : false}
               >
                 <MenuItem value="male">{t("Male")}</MenuItem>
                 <MenuItem value="female">{t("Female")}</MenuItem>
-                <MenuItem value="other">{t("Other")}</MenuItem>
               </TextField>
+              {errors.gender && (
+                <Typography color="error" sx={{ fontWeight: "bold" }}>
+                  {errors.gender}
+                </Typography>
+              )}
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -241,7 +348,49 @@ export default function SignUp() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 margin="normal"
+                error={errors.phone ? true : false}
               />
+              {errors.phone && (
+                <Typography color="error" sx={{ fontWeight: "bold" }}>
+                  {errors.phone}
+                </Typography>
+              )}
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <label htmlFor="image">
+                <input
+                  id="image"
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  onChange={handleAvatarChange}
+                />
+                <Button
+                  variant="contained"
+                  component="span" // يسمح باستخدام الزر كعنصر HTML
+                  startIcon={<Upload />} // يمكن استبدالها بأيقونة أخرى مثل Upload
+                  sx={{
+                    backgroundColor: "#1d4c6a",
+                    color: "#fff",
+                    background: `${isDragging ? "#4a6375" : errors.avatar ? "red" : ""}`,
+                    "&:hover": { backgroundColor: "#4a6375" },
+                    textTransform: "none",
+                  }}
+                  className={`${isDragging ? " bg-black" : ""}`}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                >
+                  Upload Image
+                </Button>{" "}
+              </label>
+              {avatar?.name ? avatar?.name : ""}
+
+              {errors.avatar && (
+                <Typography color="error" sx={{ fontWeight: "bold" }}>
+                  {errors.avatar}
+                </Typography>
+              )}
             </Grid>
           </Grid>
           <Button
@@ -270,7 +419,7 @@ export default function SignUp() {
           </Typography>
         </Box>
       </div>
-      <Tsparticles />
+      {/* <Tsparticles /> */}
     </>
   );
 }

@@ -105,7 +105,8 @@ export default function CustomNavBar() {
           },
         }
       );
-      setProfileData(res?.data?.profile || {});
+      setProfileData(res?.data?.profile);
+      console.log(res.data.profile);
     } catch (error) {
       console.error(error);
       if (axios.isAxiosError(error) && error.response?.status === 401) {
@@ -125,7 +126,7 @@ export default function CustomNavBar() {
     setLoadingDelete(true);
     try {
       await axios.delete(
-        `${import.meta.env.VITE_API_URL}v1/users/${profileData?.id}`,
+        `${import.meta.env.VITE_API_URL_IMAGE}v1/users/${profileData?.id}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -162,7 +163,7 @@ export default function CustomNavBar() {
               variant="h6"
               sx={{ fontWeight: "bold", color: "#ffffff" }}
             >
-              Balance
+              Legal Communication
             </Typography>
           </Box>
           <Box sx={{ flexGrow: 1 }} />
@@ -192,7 +193,7 @@ export default function CustomNavBar() {
           <IconButton onClick={handleProfileClick}>
             <Avatar
               alt="User Profile"
-              src="/path/to/profile-image.jpg"
+              src={`${import.meta.env.VITE_API_URL_IMAGE}${profileData?.avatar}`}
               sx={{ border: "2px solid #ffffff" }}
             />
           </IconButton>
@@ -238,7 +239,12 @@ export default function CustomNavBar() {
             </>
           )}
         </MenuItem>
-        <MenuItem onClick={() => setDrawerOpen(true)}>Change Password</MenuItem>
+        <MenuItem
+          onClick={() => setDrawerOpen(true)}
+          sx={{ display: "flex", justifyContent: "center" }}
+        >
+          Change Password
+        </MenuItem>
         <MenuItem>
           <Button
             variant="outlined"
@@ -249,7 +255,7 @@ export default function CustomNavBar() {
             sx={{ textTransform: "none", fontWeight: "500" }}
           >
             {loadingSignOut && <CircularProgress size={20} color="inherit" />}{" "}
-            Sign Out
+            <span className="mx-2">Sign Out</span>
           </Button>
         </MenuItem>
         <MenuItem>
@@ -311,39 +317,55 @@ export default function CustomNavBar() {
         </Box>
       </Drawer>
 
-      <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
-      <DialogTitle sx={{ fontSize: '1.25rem', fontWeight: 600, textAlign: 'center', paddingBottom: '16px' }}>
-        Confirm Account Deletion
-      </DialogTitle>
-      <DialogActions sx={{ justifyContent: 'center', paddingBottom: '16px' }}>
-        <Button
-          onClick={() => setDialogOpen(false)}
+      <Dialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle
           sx={{
-            backgroundColor: '#f0f0f0',
-            '&:hover': { backgroundColor: '#e0e0e0' },
-            borderRadius: '8px',
-            padding: '6px 16px',
+            fontSize: "1.25rem",
+            fontWeight: 600,
+            textAlign: "center",
+            paddingBottom: "16px",
           }}
         >
-          Cancel
-        </Button>
-        <Button
-          color="error"
-          variant="contained"
-          onClick={deleteAccount}
-          disabled={loadingDelete}
-          sx={{
-            marginLeft: '16px',
-            borderRadius: '8px',
-            padding: '6px 16px',
-            backgroundColor: '#e57373',
-            '&:hover': { backgroundColor: '#d32f2f' },
-          }}
-        >
-          {loadingDelete ? <CircularProgress size={20} color="inherit" /> : 'Delete Account'}
-        </Button>
-      </DialogActions>
-    </Dialog>
+          Confirm Account Deletion
+        </DialogTitle>
+        <DialogActions sx={{ justifyContent: "center", paddingBottom: "16px" }}>
+          <Button
+            onClick={() => setDialogOpen(false)}
+            sx={{
+              backgroundColor: "#f0f0f0",
+              "&:hover": { backgroundColor: "#e0e0e0" },
+              borderRadius: "8px",
+              padding: "6px 16px",
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            color="error"
+            variant="contained"
+            onClick={deleteAccount}
+            disabled={loadingDelete}
+            sx={{
+              marginLeft: "16px",
+              borderRadius: "8px",
+              padding: "6px 16px",
+              backgroundColor: "#e57373",
+              "&:hover": { backgroundColor: "#d32f2f" },
+            }}
+          >
+            {loadingDelete ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : (
+              "Delete Account"
+            )}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
