@@ -5,12 +5,16 @@ import Button from "@mui/material/Button";
 import CloseIcon from "@mui/icons-material/Close";
 import { dir } from "i18next";
 import { useSelector } from "react-redux";
-import { stateRedux } from "../../types"; 
+import { stateRedux } from "../../types";
 import { IconButton } from "@mui/material";
 import Option from "./Option";
 import { useTranslation } from "react-i18next";
-
-export default function MyDrawer() {
+import SettingsIcon from "@mui/icons-material/Settings";
+interface MyDrawerProps {
+  mode: "light" | "dark"; // نوع النمط (فاتح/داكن)
+  setMode: (mode: "light" | "dark") => void; // دالة لتغيير النمط
+}
+export default function MyDrawer({ mode, setMode }: MyDrawerProps) {
   const [open, setOpen] = React.useState(false);
   const [t] = useTranslation();
   const language = useSelector((state: stateRedux) => state.language.language);
@@ -21,7 +25,7 @@ export default function MyDrawer() {
 
   const drawerContent = (
     <Box
-      sx={{ width: 350, p: 1, justifyContent:"center"}}
+      sx={{ width: 350, p: 1, justifyContent: "center" }}
       role="presentation"
       onClick={(event) => event.stopPropagation()}
     >
@@ -36,13 +40,16 @@ export default function MyDrawer() {
         </IconButton>
         <span>{t("settings")}</span>
       </div>
-      <Option />
+      <Option setMode={setMode} mode={mode} />
     </Box>
   );
 
   return (
-    <div>
-      <Button onClick={() => toggleDrawer(true)}>Open Drawer</Button>
+    <div className=" absolute left-0 top-1/2 z-10">
+      <Button
+        onClick={() => toggleDrawer(true)}
+        startIcon={<SettingsIcon />}
+      ></Button>
       <Drawer
         variant="temporary" // استخدام persistent لإبقاء القائمة مفتوحة
         anchor={`${dir(language) === "ltr" ? "left" : "right"}`}

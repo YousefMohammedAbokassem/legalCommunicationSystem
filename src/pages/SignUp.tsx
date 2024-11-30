@@ -92,12 +92,11 @@ export default function SignUp() {
     try {
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL}v1/users/auth/signup`,
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } } // تحديد نوع المحتوى
+        formData
       );
       console.log(res);
       dispatch(logIn());
-      localStorage.setItem("access_token", res.data.token);
+      localStorage.setItem("access_token", res.data.access_token);
       setProgressLog(false);
     } catch (error) {
       if (error.response && error.response.data && error.response.data.errors) {
@@ -145,7 +144,9 @@ export default function SignUp() {
         <div className="w-2/4">
           <div className="flex items-center gap-3 mb-4">
             <img src="/balance.jpg" alt="" className="w-14 h-14 rounded-full" />
-            <span className="text-2xl font-bold text-white">Legal Communication</span>
+            <span className="text-2xl font-bold text-white">
+              Legal Communication
+            </span>
           </div>
 
           <h1 className="mb-4 font-bold text-4xl text-white">

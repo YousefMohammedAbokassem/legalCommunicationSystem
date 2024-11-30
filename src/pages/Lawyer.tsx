@@ -18,14 +18,15 @@ import CallIcon from "@mui/icons-material/Call";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { useLocation, useParams } from "react-router-dom";
 import axios from "axios";
+import Swal from 'sweetalert2'; // استيراد SweetAlert
 
 export default function Lawyer() {
   const { id } = useParams();
   const [lawyer, setLawyer] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [dialogOpen, setDialogOpen] = useState(false); // حالة الحوار
-  const [hireLoading, setHireLoading] = useState(false); // حالة التحميل عند الضغط على زر Hire
-  const [hireDetails, setHireDetails] = useState(""); // تفاصيل الطلب
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [hireLoading, setHireLoading] = useState(false);
+  const [hireDetails, setHireDetails] = useState("");
 
   const fetchLawyer = async () => {
     try {
@@ -58,11 +59,23 @@ export default function Lawyer() {
       );
       setHireLoading(false);  
       setDialogOpen(false); 
-      alert("Request sent successfully!");
+      
+      // استبدال alert باستخدام SweetAlert
+      Swal.fire({
+        title: 'Request sent successfully!',
+        icon: 'success',
+        confirmButtonText: 'OK'
+      });
+      
     } catch (error) {
       console.log(error);
-      setHireLoading(false); // تعطيل التحميل
-      // alert("Failed to send request. Please try again.");
+      setHireLoading(false);
+      // يمكنك أيضاً استخدام SweetAlert في حالة الفشل
+      Swal.fire({
+        title: 'Failed to send request. Please try again.',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
     }
   };
 
@@ -157,9 +170,6 @@ export default function Lawyer() {
           <Typography variant="h3" component="h1" mb={2} fontWeight={600}>
             Lawyer
           </Typography>
-          <Typography variant="h5" mb={1} color="primary.main">
-            My Hour is $60
-          </Typography>
           <Divider sx={{ mb: 2 }} />
           <Box>
             {loading ? (
@@ -233,7 +243,7 @@ export default function Lawyer() {
                 color="secondary"
                 startIcon={<PersonAddIcon />}
                 sx={{ minHeight: 50, minWidth: 150 }}
-                onClick={() => setDialogOpen(true)} // فتح الحوار عند الضغط
+                onClick={() => setDialogOpen(true)}
               >
                 Hire
               </Button>

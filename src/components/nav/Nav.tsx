@@ -16,7 +16,11 @@ import {
   DialogTitle,
   DialogActions,
   DialogContent,
+  List,
+  ListItem,
+  ListItemText,
 } from "@mui/material";
+import { Notifications as NotificationsIcon } from "@mui/icons-material";
 import { logoutUser } from "../../store/slices/auth/authSlice";
 import { useDispatch } from "react-redux";
 import axios from "axios";
@@ -34,6 +38,11 @@ export default function CustomNavBar() {
   const [loadingChange, setLoadingChange] = useState(false);
   const [loadProfile, setLoadProfile] = useState(false);
   const [profileData, setProfileData] = useState([]);
+  const [notificationAnchorEl, setNotificationAnchorEl] =
+    useState<HTMLElement | null>(null);
+  const [notifications, setNotifications] = useState<string[]>([]);
+  const [loadingNotifications, setLoadingNotifications] = useState(false);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -117,9 +126,34 @@ export default function CustomNavBar() {
       setLoadProfile(false);
     }
   };
+  const handleNotificationClick = (event: React.MouseEvent<HTMLElement>) => {
+    setNotificationAnchorEl(event.currentTarget);
+  };
 
+  const handleNotificationClose = () => {
+    setNotificationAnchorEl(null);
+  };
+  const fetchNotifications = async () => {
+    setLoadingNotifications(true);
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}v1/users/notifications`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+      setNotifications(res.data.notifications || []);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    } finally {
+      setLoadingNotifications(false);
+    }
+  };
   useEffect(() => {
     fetchProfile();
+    fetchNotifications();
   }, []);
 
   const deleteAccount = async () => {
@@ -142,7 +176,7 @@ export default function CustomNavBar() {
       setDialogOpen(false);
     }
   };
-
+  console.log(notifications);
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar
@@ -168,7 +202,7 @@ export default function CustomNavBar() {
           </Box>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: "flex", gap: 3 }}>
-            {["Home", "Lawyers", "الوكالات", "about"].map((label, index) => (
+            {["Home", "Lawyers", "Agencies", "About"].map((label, index) => (
               <Link
                 key={index}
                 to={`/${label.toLowerCase()}`}
@@ -190,6 +224,63 @@ export default function CustomNavBar() {
               </Link>
             ))}
           </Box>
+          <IconButton
+            color="inherit"
+            onClick={handleNotificationClick}
+            sx={{ position: "relative" }}
+          >
+            <NotificationsIcon />
+            {notifications.length > 0 && (
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: 6,
+                  right: 6,
+                  width: 8,
+                  height: 8,
+                  backgroundColor: "red",
+                  borderRadius: "50%",
+                }}
+              />
+            )}
+          </IconButton>
+          <Popover
+            open={Boolean(notificationAnchorEl)}
+            anchorEl={notificationAnchorEl}
+            onClose={handleNotificationClose}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "center",
+            }}
+            sx={{
+              "& .MuiPaper-root": {
+                borderRadius: "10px",
+                minWidth: "300px",
+                boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
+              },
+            }}
+          >
+            <Box sx={{ padding: 2 }}>
+              {loadingNotifications ? (
+                <CircularProgress size={20} />
+              ) : notifications?.length > 0 ? (
+                <List>
+                  {notifications?.map((notification, index) => (
+                    <ListItem key={index} divider>
+                    {index + 1}{"  "} : <ListItemText primary={notification?.msg} />
+                    </ListItem>
+                  ))}
+                </List>
+              ) : (
+                <Typography
+                  variant="body2"
+                  sx={{ color: "gray", textAlign: "center" }}
+                >
+                  No notifications available
+                </Typography>
+              )}
+            </Box>
+          </Popover>
           <IconButton onClick={handleProfileClick}>
             <Avatar
               alt="User Profile"
