@@ -8,10 +8,16 @@ import SignIn from "../pages/SignIn";
 import { dir } from "i18next";
 import Home from "../pages/Home";
 import Lawyer from "../pages/Lawyer"; // Main Lawyer component for displaying a specific lawyer's details
+import Agency from "../pages/Agency"; // Main Lawyer component for displaying a specific lawyer's details
 import Nav from "../components/nav/Nav";
 import Lawyers from "../pages/Lawyers"; // List of lawyers
+import Agencies from "../pages/Agencies"; // List of Agencies
 import About from "../pages/About";
 import Footer from "../components/Footer/Footer";
+import VerifyCode from "../pages/Verify";
+import Chats from "../pages/Chats";
+import Issues from "../pages/Issues";
+import Issue from "../pages/Issue";
 
 export default function Container() {
   const isAuth = useSelector((state: stateRedux) => state.auth.authenticate);
@@ -26,10 +32,12 @@ export default function Container() {
     <BrowserRouter>
       {!isAuth ? (
         <Routes>
-          <Route path="/" element={<Navigate to="SignUp" />} />
+          {/* <Route path="/" element={<Navigate to="SignUp" />} /> */}
+          {/* <Route path="home" element={<Navigate to="/SignUp" />} /> */}
           <Route path="SignUp" element={<SignUp />} />
           <Route path="SignIn" element={<SignIn />} />
-          <Route path="*" element={<Page404 />} />
+          <Route path="VerifyCode" element={<VerifyCode />} />
+          <Route path="*" element={<Navigate to="SignUp" />} />
         </Routes>
       ) : (
         <div>
@@ -38,11 +46,19 @@ export default function Container() {
             <Route path="/" element={<Navigate to="/home" />} />
             <Route path="/SignUp" element={<Navigate to="/home" />} />
             <Route path="/SignIn" element={<Navigate to="/home" />} />
+            <Route path="/VerifyCode" element={<Navigate to="/home" />} />
             <Route path="home" element={<Home />} />
             <Route path="about" element={<About />} />
             <Route path="lawyers" element={<Lawyers />} />
             <Route path="lawyers/:id" element={<Lawyer />} />{" "}
             {/* Nested Lawyer route */}
+            <Route path="agencies" element={<Agencies />} />
+            <Route path="agencies/:id" element={<Agency />} />{" "}
+            {/* Nested agency route */}
+            <Route path="issues" element={<Issues />} />
+            <Route path="issues/:id" element={<Issue />} />{" "}
+            {/* Nested Issue route */}
+            <Route path="chats" element={<Chats />} />
             <Route path="*" element={<Page404 />} />
           </Routes>
           <Footer />

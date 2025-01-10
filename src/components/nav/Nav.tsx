@@ -58,8 +58,10 @@ export default function CustomNavBar() {
     setLoadingSignOut(true);
     try {
       await axios.post(
-        `${import.meta.env.VITE_API_URL}v1/users/auth/signout`,
-        {},
+        `${import.meta.env.VITE_API_URL}v1/auth/app/signout`,
+        {
+          role: localStorage.getItem("role") || "user",
+        },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -160,7 +162,7 @@ export default function CustomNavBar() {
     setLoadingDelete(true);
     try {
       await axios.delete(
-        `${import.meta.env.VITE_API_URL_IMAGE}v1/users/${profileData?.id}`,
+        `${import.meta.env.VITE_API_URL}v1/users/delete-account`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -168,9 +170,9 @@ export default function CustomNavBar() {
         }
       );
       dispatch(logoutUser());
-      navigate("/SignIn");
+      navigate("/SignUp");
     } catch (error) {
-      console.error("Error deleting account:", error);
+      console.log("Error deleting account:", error);
     } finally {
       setLoadingDelete(false);
       setDialogOpen(false);
@@ -202,7 +204,7 @@ export default function CustomNavBar() {
           </Box>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: "flex", gap: 3 }}>
-            {["Home", "Lawyers", "Agencies", "About"].map((label, index) => (
+            {["Home", "Lawyers", "Agencies","Issues", "About"].map((label, index) => (
               <Link
                 key={index}
                 to={`/${label.toLowerCase()}`}
@@ -267,7 +269,8 @@ export default function CustomNavBar() {
                 <List>
                   {notifications?.map((notification, index) => (
                     <ListItem key={index} divider>
-                    {index + 1}{"  "} : <ListItemText primary={notification?.msg} />
+                      {index + 1}
+                      {"  "} : <ListItemText primary={notification?.msg} />
                     </ListItem>
                   ))}
                 </List>

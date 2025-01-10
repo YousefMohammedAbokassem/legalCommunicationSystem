@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 export default function Lawyers() {
   const [t] = useTranslation();
   const navigate = useNavigate();
-  const [lawyers, setLawyers] = useState([]);
+  const [agencies, setLawyers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1); // Track the current page
   const [hasMore, setHasMore] = useState(true); // To check if more data is available
@@ -35,14 +35,15 @@ export default function Lawyers() {
     try {
       setLoading(true);
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}v1/users/get-lawyers?page=${page}`,
+        `${import.meta.env.VITE_API_URL}v1/users/get-agencies?page=${page}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("access_token")}`,
           },
         }
       );
-      const newLawyers = res?.data?.lawyers || [];
+      const newLawyers = res?.data?.agencies || [];
+      console.log(newLawyers);
       setLawyers((prev) => [...prev, ...newLawyers]); // Append new data
       setHasMore(newLawyers.length > 0); // Stop if no more data
     } catch (error) {
@@ -80,8 +81,8 @@ export default function Lawyers() {
   return (
     <Box sx={{ padding: 4 }}>
       <Grid container spacing={4}>
-        {lawyers.map((lawyer) => (
-          <Grid item xs={12} sm={6} md={4} key={lawyer.id}>
+        {agencies.map((agency,i) => (
+          <Grid item xs={12} sm={6} md={4} key={agency?.id}>
             <Card
               sx={{
                 height: "100%",
@@ -106,43 +107,41 @@ export default function Lawyers() {
                   },
                 }}
               >
-                <div className="flex h-full items-start justify-between flex-col gap-2 relative specialLawer py-4 px-5">
-                  <div className="flex justify-center items-center gap-2 ">
-                    <img
-                      className="w-[50px] h-[50px] rounded-full"
-                      src={`${lawyer?.avatar}`}
-                      alt="Guest 1"
-                    />
-
-                    <div>
-                      <h3 className="text-[var(--clr-product)] font-bold">
-                        {lawyer?.name}
-                      </h3>
-                      <h3 className="text-[var(--clr-product)] font-bold">
-                        {lawyer?.email}
-                      </h3>
-                    </div>
-                  </div>
-                  <p className=" leading-7">{lawyer?.description}</p>
+                <div className="flex h-full items-start justify-between flex-col gap-2 relative specialAgency py-4 px-5">
                   <div>
-                    <span className="font-bold">{t("address")} :</span>
-                    <span>{lawyer?.address}</span>
+                    <span className="font-bold">{t("lawyer_name")} :</span>
+                    <span>{agency?.lawyer_name}</span>
                   </div>
                   <div>
-                    <span className="font-bold">
-                      {t("yearsOf")} : <bdi>{t("year")}</bdi>{" "}
-                    </span>
-                    <span>{lawyer?.years_of_experience}</span>
+                    <span className="font-bold">{t("type")} :</span>
+                    <span>{agency?.type}</span>
                   </div>
                   <div>
-                    <Rating value={lawyer?.rank} readOnly />{" "}
+                    <span className="font-bold">{t("place_of_issue")} :</span>
+                    <span>{agency?.place_of_issue}</span>
                   </div>
+                  <div>
+                    <span className="font-bold">{t("recordNumber")} :</span>
+                    <span>{agency?.record_number}</span>
+                  </div>
+                  <div>
+                    <span className="font-bold">{t("status")} :</span>
+                    <span>{agency?.status}</span>
+                  </div>
+                  <div>
+                    <span className="font-bold">{t("is_active")} :</span>
+                    <span>{agency?.is_active}</span>
+                  </div>
+                  {/* <div>
+                    <span className="font-bold">{t("exceptions")} :</span>
+                    <span>{agency?.exceptions}</span>
+                  </div> */}
                   <button
                     type="button"
-                    className=" ms-auto ButtonOfLawers rounded-md"
+                    className="ms-auto ButtonOfAgencies rounded-md"
                     onMouseMove={(e) => HoverAction(e)}
                     onClick={() => {
-                      navigate(`/lawyers/${lawyer?.id}`);
+                      navigate(`/agencies/${agency?.id}`);
                       window.scrollTo({
                         top: 0,
                         left: 0,
@@ -150,7 +149,7 @@ export default function Lawyers() {
                       });
                     }}
                   >
-                    {t("pageOfLawer")}
+                    {t("pageOfAgency")}
                   </button>
                 </div>
               </CardContent>

@@ -16,9 +16,9 @@ import {
 } from "@mui/material";
 import CallIcon from "@mui/icons-material/Call";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import axios from "axios";
-import Swal from 'sweetalert2'; // استيراد SweetAlert
+import Swal from "sweetalert2";
 
 export default function Lawyer() {
   const { id } = useParams();
@@ -27,11 +27,15 @@ export default function Lawyer() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [hireLoading, setHireLoading] = useState(false);
   const [hireDetails, setHireDetails] = useState("");
+  const [rating, setRating] = useState(0); // To store the rating value
+  const [review, setReview] = useState(""); // To store the review message
+  const [ratingDialogOpen, setRatingDialogOpen] = useState(false); // To control rating dialog visibility
+  const [submitLoading, setSubmitLoading] = useState(false); // To manage submit button loading state
 
   const fetchLawyer = async () => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}v1/users/get-lawyers/${parseInt(`${id}`)}`,
+        `${import.meta.env.VITE_API_URL}v1/users/get-lawyers/${parseInt(id)}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -46,10 +50,11 @@ export default function Lawyer() {
   };
 
   const agencyLawyer = async () => {
-    setHireLoading(true); 
+    console.log(import.meta.env.VITE_API_URL);
+    setHireLoading(true);
     try {
       await axios.post(
-        `${import.meta.env.VITE_API_URL}v1/users/send-notify-to-lawyer`,
+        `${import.meta.env.VITE_API_URL}v1/users/send-agency-notice`,
         { cause: hireDetails, lawyer_id: id },
         {
           headers: {
@@ -57,25 +62,54 @@ export default function Lawyer() {
           },
         }
       );
-      setHireLoading(false);  
-      setDialogOpen(false); 
-      
-      // استبدال alert باستخدام SweetAlert
+      setHireLoading(false);
+      setDialogOpen(false);
       Swal.fire({
-        title: 'Request sent successfully!',
-        icon: 'success',
-        confirmButtonText: 'OK'
+        title: "Request sent successfully!",
+        icon: "success",
+        confirmButtonText: "OK",
       });
-      
     } catch (error) {
       console.log(error);
       setHireLoading(false);
-      // يمكنك أيضاً استخدام SweetAlert في حالة الفشل
+      setDialogOpen(false);
+
       Swal.fire({
-        title: 'Failed to send request. Please try again.',
-        icon: 'error',
-        confirmButtonText: 'OK'
+        title: "Failed to send request. Please try again.",
+        icon: "error",
+        confirmButtonText: "OK",
       });
+    }
+  };
+
+  const submitRating = async () => {
+    if (submitLoading) return; // Prevent submitting if already loading
+    setSubmitLoading(true); // Set loading state to true
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}v1/users/all-rates`,
+        { rating, review, lawyer_id: id },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+      setRatingDialogOpen(false);
+      Swal.fire({
+        title: "Rating submitted successfully!",
+        icon: "success",
+        confirmButtonText: "OK",
+      });
+    } catch (error) {
+      console.log(error);
+      Swal.fire({
+        title: "Failed to submit rating. Please try again.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+    } finally {
+      setSubmitLoading(false); // Reset the loading state
     }
   };
 
@@ -196,6 +230,7 @@ export default function Lawyer() {
               variant="subtitle1"
               component="p"
               color="text.secondary"
+              onClick={() => setRatingDialogOpen(true)}
             >
               Rank
             </Typography>
@@ -207,9 +242,9 @@ export default function Lawyer() {
               <Rating
                 name="read-only"
                 value={lawyer?.rank}
-                readOnly
                 precision={1}
                 sx={{ "& .MuiRating-icon": { fontSize: "1.75rem" } }}
+                onClick={() => setRatingDialogOpen(true)} // Open dialog on star click
               />
             )}
           </Box>
@@ -274,6 +309,42 @@ export default function Lawyer() {
             disabled={hireLoading}
           >
             {hireLoading ? <CircularProgress size={24} /> : "Hire"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Dialog for Rating */}
+      <Dialog
+        open={ratingDialogOpen}
+        onClose={() => setRatingDialogOpen(false)}
+      >
+        <DialogTitle>Rate and Review Lawyer</DialogTitle>
+        <DialogContent>
+          <Rating
+            name="rating"
+            value={rating}
+            onChange={(event, newValue) => setRating(newValue)}
+            precision={1}
+          />
+          <TextField
+            label="Review"
+            fullWidth
+            multiline
+            rows={4}
+            value={review}
+            onChange={(e) => setReview(e.target.value)}
+            sx={{ mt: 2 }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setRatingDialogOpen(false)}>Cancel</Button>
+          <Button
+            onClick={submitRating}
+            variant="contained"
+            color="primary"
+            disabled={submitLoading || rating === 0 || !review}
+          >
+            {submitLoading ? <CircularProgress size={24} /> : "Submit Rating"}
           </Button>
         </DialogActions>
       </Dialog>

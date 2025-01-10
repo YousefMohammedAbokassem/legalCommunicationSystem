@@ -38,7 +38,7 @@ export default function SignIn() {
     try {
       e.preventDefault();
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}v1/users/auth/signin`,
+        `${import.meta.env.VITE_API_URL}v1/auth/app/signin`,
         {
           email,
           password,

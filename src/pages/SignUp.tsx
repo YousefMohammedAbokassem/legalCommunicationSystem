@@ -91,17 +91,21 @@ export default function SignUp() {
 
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}v1/users/auth/signup`,
+        `${import.meta.env.VITE_API_URL}v1/auth/app/user/signup`,
         formData
       );
-      console.log(res);
-      dispatch(logIn());
-      localStorage.setItem("access_token", res.data.access_token);
+      // dispatch(logIn());
+      localStorage.setItem("email", email);
+      if(res?.data?.isSuccess){
+        navigate("/VerifyCode")
+      }
       setProgressLog(false);
+      console.log(res);
     } catch (error) {
-      if (error.response && error.response.data && error.response.data.errors) {
-        console.error(error.response.data.errors);
-        const serverErrors = error.response.data.errors;
+      console.log(error)
+      if (error.response && error.response.data && error.response.data.error) {
+        console.error(error.response.data.error);
+        const serverErrors = error.response.data.error;
         setErrors({
           // ...prevErrors,
           username: serverErrors.name?.[0] || "",

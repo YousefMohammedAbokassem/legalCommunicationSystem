@@ -6,7 +6,7 @@ export default function OurServices() {
   const [t] = useTranslation();
 
   return (
-    <footer className="bg-[var(--clr-product)] py-12 text-white">
+    <footer className="bg-[var(--clr-product)] py-12 text-white footer">
       <div className="container mx-auto px-6">
         {/* Footer Top Section */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-12 space-y-10 md:space-y-0">
