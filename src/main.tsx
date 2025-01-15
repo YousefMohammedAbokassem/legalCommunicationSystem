@@ -5,6 +5,8 @@ import "./i18.tsx";
 import { Provider } from "react-redux";
 import store from "./store/store";
 import Container from "./components/Container.tsx";
+import Notification from "./components/Notifications/Notifications.js";
+
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 const theme = createTheme({
   palette: {
@@ -17,6 +19,7 @@ createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
     <ThemeProvider theme={theme}>
       <Container />
+      {/* <Notification /> */}
     </ThemeProvider>
   </Provider>
 );

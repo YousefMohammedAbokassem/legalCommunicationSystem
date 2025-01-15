@@ -18,6 +18,8 @@ import VerifyCode from "../pages/Verify";
 import Chats from "../pages/Chats";
 import Issues from "../pages/Issues";
 import Issue from "../pages/Issue";
+import Coutrs from "../pages/Courts";
+import Coutr from "../pages/Coutr";
 
 export default function Container() {
   const isAuth = useSelector((state: stateRedux) => state.auth.authenticate);
@@ -49,8 +51,22 @@ export default function Container() {
             <Route path="/VerifyCode" element={<Navigate to="/home" />} />
             <Route path="home" element={<Home />} />
             <Route path="about" element={<About />} />
-            <Route path="lawyers" element={<Lawyers />} />
-            <Route path="lawyers/:id" element={<Lawyer />} />{" "}
+            {localStorage.getItem("role") === "user" ? (
+              <>
+                <Route path="lawyers" element={<Lawyers />} />
+                <Route path="lawyers/:id" element={<Lawyer />} />{" "}
+              </>
+            ) : (
+              ""
+            )}
+            {localStorage.getItem("role") !== "user" ? (
+              <>
+                <Route path="Coutrs" element={<Coutrs />} />
+                <Route path="Coutrs/:id" element={<Coutr />} />{" "}
+              </>
+            ) : (
+              ""
+            )}
             {/* Nested Lawyer route */}
             <Route path="agencies" element={<Agencies />} />
             <Route path="agencies/:id" element={<Agency />} />{" "}

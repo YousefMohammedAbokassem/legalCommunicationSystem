@@ -204,28 +204,45 @@ export default function CustomNavBar() {
           </Box>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: "flex", gap: 3 }}>
-            {["Home", "Lawyers", "Agencies","Issues", "About"].map((label, index) => (
-              <Link
-                key={index}
-                to={`/${label.toLowerCase()}`}
-                style={{ textDecoration: "none" }}
-              >
-                <Button
-                  sx={{
-                    color: "#ffffff",
-                    textTransform: "none",
-                    fontWeight: "500",
-                    "&:hover": {
-                      color: "#fff",
-                      backgroundColor: "rgba(255, 255, 255, 0.1)",
-                    },
-                  }}
-                >
-                  {label}
-                </Button>
-              </Link>
-            ))}
+            {["Home", "Lawyers","Courts", "Agencies", "Issues", "About"].map(
+              (label, index) => {
+                if (
+                  label === "Lawyers" &&
+                  localStorage.getItem("role") !== "user"
+                ) {
+                  return null;
+                }
+                if (
+                  label === "Courts" &&
+                  localStorage.getItem("role") === "user"
+                ) {
+                  return null;
+                }
+                return (
+                  <Link
+                    key={index}
+                    to={`/${label.toLowerCase()}`}
+                    style={{ textDecoration: "none" }}
+                  >
+                    <Button
+                      sx={{
+                        color: "#ffffff",
+                        textTransform: "none",
+                        fontWeight: "500",
+                        "&:hover": {
+                          color: "#fff",
+                          backgroundColor: "rgba(255, 255, 255, 0.1)",
+                        },
+                      }}
+                    >
+                      {label}
+                    </Button>
+                  </Link>
+                );
+              }
+            )}
           </Box>
+
           <IconButton
             color="inherit"
             onClick={handleNotificationClick}

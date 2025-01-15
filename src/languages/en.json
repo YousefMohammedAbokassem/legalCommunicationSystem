@@ -23,6 +23,12 @@
   "weWork": "We work hard to meet our customers' needs and achieve their complete satisfaction. We believe that innovation and continuous development are the key to success in today's world, and we strive to adopt the latest technologies and best practices in providing our services.",
   "Hiring": "Hiring lawyers",
   "contactDirict": "contact directly with lawyers",
-  "track": "Track the status of cases"
-
+  "track": "Track the status of cases",
+  "delete_agency": "Delete Agency",
+  "confirm_delete_agency": "Confirm Deletion",
+  "are_you_sure_to_delete_agency": "Are you sure you want to delete this agency?",
+  "yes": "Yes",
+  "no": "No",
+  "agency_deleted_successfully": "Agency deleted successfully!",
+  "failed_to_delete_agency": "Failed to delete agency. Please try again."
 }

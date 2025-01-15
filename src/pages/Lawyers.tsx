@@ -110,7 +110,7 @@ export default function Lawyers() {
                   <div className="flex justify-center items-center gap-2 ">
                     <img
                       className="w-[50px] h-[50px] rounded-full"
-                      src={`${lawyer?.avatar}`}
+                      src={`${import.meta.env.VITE_API_URL_IMAGE}${lawyer?.avatar}`}
                       alt="Guest 1"
                     />
 
