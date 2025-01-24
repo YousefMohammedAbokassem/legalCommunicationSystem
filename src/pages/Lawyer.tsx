@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import CallIcon from "@mui/icons-material/Call";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import { useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 
@@ -31,7 +31,7 @@ export default function Lawyer() {
   const [review, setReview] = useState(""); // To store the review message
   const [ratingDialogOpen, setRatingDialogOpen] = useState(false); // To control rating dialog visibility
   const [submitLoading, setSubmitLoading] = useState(false); // To manage submit button loading state
-
+  const navigate = useNavigate();
   const fetchLawyer = async () => {
     try {
       const res = await axios.get(
@@ -264,6 +264,7 @@ export default function Lawyer() {
                 color="primary"
                 startIcon={<CallIcon />}
                 sx={{ minHeight: 50, minWidth: 150 }}
+                onClick={() => navigate(`/chats`)}
               >
                 Contact
               </Button>

@@ -20,6 +20,7 @@ import Issues from "../pages/Issues";
 import Issue from "../pages/Issue";
 import Coutrs from "../pages/Courts";
 import Coutr from "../pages/Coutr";
+import Example from "../pages/Example";
 
 export default function Container() {
   const isAuth = useSelector((state: stateRedux) => state.auth.authenticate);
@@ -50,7 +51,8 @@ export default function Container() {
             <Route path="/SignIn" element={<Navigate to="/home" />} />
             <Route path="/VerifyCode" element={<Navigate to="/home" />} />
             <Route path="home" element={<Home />} />
-            <Route path="about" element={<About />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/example" element={<Example />} />
             {localStorage.getItem("role") === "user" ? (
               <>
                 <Route path="lawyers" element={<Lawyers />} />
@@ -61,8 +63,8 @@ export default function Container() {
             )}
             {localStorage.getItem("role") !== "user" ? (
               <>
-                <Route path="Coutrs" element={<Coutrs />} />
-                <Route path="Coutrs/:id" element={<Coutr />} />{" "}
+                <Route path="courts" element={<Coutrs />} />
+                <Route path="courts/:id" element={<Coutr />} />{" "}
               </>
             ) : (
               ""

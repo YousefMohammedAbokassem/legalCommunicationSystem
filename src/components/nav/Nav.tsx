@@ -19,12 +19,15 @@ import {
   List,
   ListItem,
   ListItemText,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { Notifications as NotificationsIcon } from "@mui/icons-material";
 import { logoutUser } from "../../store/slices/auth/authSlice";
 import { useDispatch } from "react-redux";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
+import Pusher from "pusher-js";
 
 export default function CustomNavBar() {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -45,7 +48,117 @@ export default function CustomNavBar() {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [dataNotification, setDataNotification] = useState({});
+  const handleSnackbarClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
+  useEffect(() => {
+    // استرجاع الـ token من الـ localStorage
+    let accessToken = localStorage.getItem("access_token");
 
+    // إذا كان هناك token قم باضافته في التوثيق (إذا كانت هذه هي حاجتك)
+    console.log("Access Token:", accessToken);
+
+    // إعداد Pusher
+    let pusher = new Pusher("7e221c9a276e6d97951f", {
+      cluster: "mt1",
+      forceTLS: true,
+      // إضافة الـ token للتوثيق (إذا كنت بحاجة إليه)
+      auth: {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    });
+
+    // التحقق من الاتصال بـ Pusher
+    pusher.connection.bind("connected", () => {
+      console.log("Connected to Pusher!");
+    });
+
+    pusher.connection.bind("error", (err) => {
+      console.error("Pusher connection error:", err);
+    });
+
+    // الاشتراك في القنوات مباشرة بدون متغيرات
+    console.log({ profileData });
+    pusher
+      .subscribe(`lawyer_notifications_${profileData?.id}`)
+      .bind("send.notification.from.user.to.lawyer", (data) => {
+        console.log("New message received from message.sent channel: ", data);
+        setDataNotification(data);
+        setSnackbarOpen(true);
+        const newMessageObj = {
+          agency_id: data.id,
+          msg: data.message,
+        };
+
+        setNotifications((prevMessages) => [...prevMessages, newMessageObj]);
+        // alert(`New message: ${data}`); // يمكن إضافة رسالة منبثقة للاختبار
+      });
+    pusher
+      .subscribe(`lawyer_notifications_${profileData?.id}`)
+      .bind("send.notification.from.representative.to.lawyer", (data) => {
+        console.log("New message received from message.sent channel: ", data);
+        setDataNotification(data);
+        setSnackbarOpen(true);
+        const newMessageObj = {
+          agency_id: data.id,
+          msg: data.message,
+        };
+
+        setNotifications((prevMessages) => [...prevMessages, newMessageObj]);
+        // alert(`New message: ${data}`); // يمكن إضافة رسالة منبثقة للاختبار
+      });
+
+    pusher
+      .subscribe("send.notification.from.user.to.lawyer")
+      .bind("new_notification", (data) => {
+        console.log("New notification from user to lawyer: ", data);
+      });
+
+    pusher
+      .subscribe("send.notification.from.representative.to.lawyer")
+      .bind("new_notification", (data) => {
+        console.log("New notification from representative to lawyer: ", data);
+      });
+
+    pusher
+      .subscribe("send.notification.from.representative.to.user")
+      .bind("new_notification", (data) => {
+        console.log("New notification from representative to user: ", data);
+      });
+
+    pusher
+      .subscribe("send.notification.from.lawyer.to.representative")
+      .bind("new_notification", (data) => {
+        console.log("New notification from lawyer to representative: ", data);
+      });
+
+    pusher
+      .subscribe("send.notification.from.lawyer.to.user")
+      .bind("new_notification", (data) => {
+        console.log("New notification from lawyer to user: ", data);
+      });
+
+    // تنظيف عند مغادرة المكون
+    return () => {
+      pusher.unsubscribe("message.sent");
+      pusher.unsubscribe("conversation_77");
+      pusher.unsubscribe("send.notification.from.user.to.lawyer");
+      pusher.unsubscribe("send.notification.from.representative.to.lawyer");
+      pusher.unsubscribe("send.notification.from.representative.to.user");
+      pusher.unsubscribe("send.notification.from.lawyer.to.representative");
+      pusher.unsubscribe("send.notification.from.lawyer.to.user");
+    };
+  }, [profileData]);
   const handleProfileClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -85,7 +198,7 @@ export default function CustomNavBar() {
     setLoadingChange(true);
     try {
       await axios.post(
-        `${import.meta.env.VITE_API_URL}v1/users/change-password`,
+        `${import.meta.env.VITE_API_URL}v1/${localStorage.getItem("role")}s/change-password`,
         {
           current_password: currentPassword,
           new_password: newPassword,
@@ -109,7 +222,7 @@ export default function CustomNavBar() {
     setLoadProfile(true);
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}v1/users/profile`,
+        `${import.meta.env.VITE_API_URL}v1/${localStorage.getItem("role")}s/profile`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -117,7 +230,6 @@ export default function CustomNavBar() {
         }
       );
       setProfileData(res?.data?.profile);
-      console.log(res.data.profile);
     } catch (error) {
       console.error(error);
       if (axios.isAxiosError(error) && error.response?.status === 401) {
@@ -139,7 +251,7 @@ export default function CustomNavBar() {
     setLoadingNotifications(true);
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}v1/users/notifications`,
+        `${import.meta.env.VITE_API_URL}v1/get-notifications`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -162,7 +274,7 @@ export default function CustomNavBar() {
     setLoadingDelete(true);
     try {
       await axios.delete(
-        `${import.meta.env.VITE_API_URL}v1/users/delete-account`,
+        `${import.meta.env.VITE_API_URL}v1/${localStorage.getItem("role")}s/delete-account`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -178,7 +290,6 @@ export default function CustomNavBar() {
       setDialogOpen(false);
     }
   };
-  console.log(notifications);
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar
@@ -204,7 +315,7 @@ export default function CustomNavBar() {
           </Box>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: "flex", gap: 3 }}>
-            {["Home", "Lawyers","Courts", "Agencies", "Issues", "About"].map(
+            {["Home", "Lawyers", "Courts", "Agencies", "Issues", "About"].map(
               (label, index) => {
                 if (
                   label === "Lawyers" &&
@@ -285,7 +396,27 @@ export default function CustomNavBar() {
               ) : notifications?.length > 0 ? (
                 <List>
                   {notifications?.map((notification, index) => (
-                    <ListItem key={index} divider>
+                    <ListItem
+                      key={index}
+                      divider
+                      sx={{
+                        cursor: "pointer",
+                        transition: "all 0.3s ease-in-out",
+                        "&:hover": {
+                          backgroundColor: "#1d4c6a8a", // لون الخلفية عند التمرير
+                          color: "#fff",
+                          transform: "scale(1.02)", // تكبير بسيط عند التمرير
+                        },
+                        "&:active": {
+                          backgroundColor: "#1d4c6a",
+                          color: "#fff", // لون الخلفية عند النقر
+                          transform: "scale(0.98)", // تصغير بسيط عند النقر
+                        },
+                      }}
+                      onClick={() => {
+                        navigate(`/agencies/${notification?.agency_id}`);
+                      }}
+                    >
                       {index + 1}
                       {"  "} : <ListItemText primary={notification?.msg} />
                     </ListItem>
@@ -477,6 +608,21 @@ export default function CustomNavBar() {
           </Button>
         </DialogActions>
       </Dialog>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={5000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        onClick={() => navigate(`/agencies/${dataNotification?.id}`)}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          {dataNotification?.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

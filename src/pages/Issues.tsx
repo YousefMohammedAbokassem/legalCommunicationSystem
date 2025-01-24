@@ -94,90 +94,118 @@ export default function Issues() {
         </Box>
       ) : (
         <Grid container spacing={4}>
-          {issues.length
-            ? issues.map((issue) => (
-                <Grid item xs={12} sm={6} md={4} key={issue?.id}>
-                  <Card
+          {issues.length ? (
+            issues.map((issue) => (
+              <Grid item xs={12} sm={6} md={4} key={issue?.id}>
+                <Card
+                  sx={{
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    boxShadow: "0 6px 10px rgba(0, 0, 0, 0.1)",
+                    borderRadius: "16px",
+                    transition: "transform 0.3s, box-shadow 0.3s",
+                    overflow: "hidden",
+                    "&:hover": {
+                      transform: "translateY(-8px)",
+                      boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
+                    },
+                  }}
+                >
+                  <CardContent
                     sx={{
-                      height: "100%",
+                      padding: "16px",
                       display: "flex",
                       flexDirection: "column",
-                      boxShadow: "0 6px 10px rgba(0, 0, 0, 0.1)",
-                      borderRadius: "16px",
-                      transition: "transform 0.3s, box-shadow 0.3s",
-                      overflow: "hidden",
-                      "&:hover": {
-                        transform: "translateY(-8px)",
-                        boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
-                      },
+                      gap: 2,
                     }}
                   >
-                    <CardContent
+                    <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                      {t("base_number")}: {issue?.base_number}
+                    </Typography>
+                    <Typography variant="body2">
+                      {t("record_number")}: {issue?.record_number}
+                    </Typography>
+                    <Typography variant="body2">
+                      {t("agency_record")}: {issue?.agency_record}
+                    </Typography>
+                    <Typography variant="body2">
+                      {t("court_name")}: {issue?.court_name}
+                    </Typography>
+                    <Typography variant="body2">
+                      {t("court_room_name")}: {issue?.court_room_name}
+                    </Typography>
+                    <Typography variant="body2">
+                      {t("start_date")}: {issue?.start_date}
+                    </Typography>
+                    <Typography variant="body2">
+                      {t("end_date")}: {issue?.end_date || t("ongoing")}
+                    </Typography>
+                    <Typography variant="body2">
+                      {t("status")}: {issue?.status}
+                    </Typography>
+                    <Typography variant="body2">
+                      {t("estimated_cost")}: {issue?.estimated_cost}
+                    </Typography>
+                    <Typography variant="body2">
+                      {t("is_active")}: {issue?.is_active}
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      fullWidth
                       sx={{
-                        padding: "16px",
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 2,
+                        marginTop: "auto",
+                        background: "linear-gradient(90deg, #5c7c93, #8fa4b9)",
+                        color: "#FFF",
+                        textTransform: "capitalize",
+                        fontWeight: "bold",
+                        borderRadius: "8px",
+                      }}
+                      onClick={() => {
+                        navigate(`/issues/${issue?.id}`);
+                        window.scrollTo({
+                          top: 0,
+                          left: 0,
+                          behavior: "smooth",
+                        });
                       }}
                     >
-                      <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                        {t("base_number")}: {issue?.base_number}
-                      </Typography>
-                      <Typography variant="body2">
-                        {t("record_number")}: {issue?.record_number}
-                      </Typography>
-                      <Typography variant="body2">
-                        {t("agency_record")}: {issue?.agency_record}
-                      </Typography>
-                      <Typography variant="body2">
-                        {t("court_name")}: {issue?.court_name}
-                      </Typography>
-                      <Typography variant="body2">
-                        {t("court_room_name")}: {issue?.court_room_name}
-                      </Typography>
-                      <Typography variant="body2">
-                        {t("start_date")}: {issue?.start_date}
-                      </Typography>
-                      <Typography variant="body2">
-                        {t("end_date")}: {issue?.end_date || t("ongoing")}
-                      </Typography>
-                      <Typography variant="body2">
-                        {t("status")}: {issue?.status}
-                      </Typography>
-                      <Typography variant="body2">
-                        {t("estimated_cost")}: {issue?.estimated_cost}
-                      </Typography>
-                      <Typography variant="body2">
-                        {t("is_active")}: {issue?.is_active}
-                      </Typography>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        fullWidth
-                        sx={{
-                          marginTop: "auto",
-                          background: "linear-gradient(90deg, #5c7c93, #8fa4b9)",
-                          color: "#FFF",
-                          textTransform: "capitalize",
-                          fontWeight: "bold",
-                          borderRadius: "8px",
-                        }}
-                        onClick={() => {
-                          navigate(`/issues/${issue?.id}`);
-                          window.scrollTo({
-                            top: 0,
-                            left: 0,
-                            behavior: "smooth",
-                          });
-                        }}
-                      >
-                        {t("viewDetails")}
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))
-            : t("noData")}
+                      {t("viewDetails")}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))
+          ) : (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                flexDirection: "column",
+                padding: "20px",
+                background: "linear-gradient(90deg, #f7f9fc, #eef3f7)",
+                borderRadius: "12px",
+                boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                margin: "40px auto",
+                maxWidth: "600px",
+                textAlign: "center",
+              }}
+            >
+              <Typography
+                variant="h6"
+                sx={{
+                  fontWeight: "bold",
+                  fontSize: "20px",
+                  color: "#5c7c93",
+                  marginBottom: "8px",
+                }}
+              >
+                {t("noIssues")}
+              </Typography>
+            </Box>
+          )}
         </Grid>
       )}
     </Box>

@@ -47,6 +47,8 @@ export default function SignIn() {
       console.log(res);
       dispatch(logIn());
       localStorage.setItem("access_token", res.data.access_token);
+      localStorage.setItem("role", res.data.role);
+
       setProgressLog(false);
     } catch (error) {
       console.log(typeof error.response.data.error);

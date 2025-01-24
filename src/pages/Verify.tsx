@@ -76,10 +76,11 @@ export default function VerifyCode() {
       );
       console.log(res);
       dispatch(logIn());
-      
       navigate("/");
       localStorage.setItem("access_token", res.data.access_token);
-      localStorage.removeItem("email")
+      localStorage.setItem("role", res.data.role);
+
+      localStorage.removeItem("email");
     } catch (error: any) {
       setError("incorrect" || "An error occurred.");
       setProgressVerify(false);

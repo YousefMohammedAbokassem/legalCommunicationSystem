@@ -142,7 +142,78 @@ export default function Agency() {
       Swal.fire(t("failed_to_delete_note"), "", "error");
     }
   };
+  // State for attachments
+  const [attachments, setAttachments] = useState([]);
+  const [attachmentsLoading, setAttachmentsLoading] = useState(false);
+  const [attachmentsDialogOpen, setAttachmentsDialogOpen] = useState(false);
+  const [newAttachment, setNewAttachment] = useState(null);
 
+  // Fetch attachments
+  const fetchAttachments = async () => {
+    setAttachmentsLoading(true);
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}v1/issues/${id}/attachments`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+      setAttachments(res?.data?.attachments || []);
+      setAttachmentsLoading(false);
+    } catch (error) {
+      console.log(error);
+      setAttachmentsLoading(false);
+    }
+  };
+
+  // Add attachment
+  const handleAddAttachment = async () => {
+    if (!newAttachment) return;
+
+    const formData = new FormData();
+    formData.append("type", "pdf");
+    formData.append("attachments[]", newAttachment);
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}v1/issues/${id}/attachments`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      setAttachments((prev) => [...prev, res.data]);
+      setNewAttachment(null);
+      console.log(formData)
+      Swal.fire(t("attachment_added_successfully"), "", "success");
+    } catch (error) {
+      console.log(error);
+      Swal.fire(t("failed_to_add_attachment"), "", "error");
+    }
+  };
+
+  // Delete attachment
+  const handleDeleteAttachment = async (attachmentId) => {
+    try {
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL}v1/issues/${id}/attachments/${attachmentId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+      setAttachments((prev) => prev.filter((att) => att.id !== attachmentId));
+      Swal.fire(t("attachment_deleted_successfully"), "", "success");
+    } catch (error) {
+      console.log(error);
+      Swal.fire(t("failed_to_delete_attachment"), "", "error");
+    }
+  };
   useEffect(() => {
     fetchIssue();
   }, []);
@@ -203,7 +274,6 @@ export default function Agency() {
             )}
           </Typography>
         </Box>
-
         <CardContent>
           <Box display="grid" gridTemplateColumns="1fr 1fr" gap={3}>
             <Box>
@@ -256,9 +326,7 @@ export default function Agency() {
             </Box>
           </Box>
         </CardContent>
-
         <Divider />
-
         <CardActions sx={{ justifyContent: "flex-end", p: 2 }}>
           <Button
             variant="outlined"
@@ -272,9 +340,21 @@ export default function Agency() {
           >
             {t("view_notes")}
           </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            startIcon={<NoteIcon />}
+            onClick={() => {
+              fetchAttachments();
+              setAttachmentsDialogOpen(true);
+            }}
+            disabled={loading}
+          >
+            {t("view_attachments")}
+          </Button>
         </CardActions>
+        ;
       </Card>
-
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} fullWidth>
         <DialogTitle>{t("notes")}</DialogTitle>
         <DialogContent>
@@ -375,6 +455,97 @@ export default function Agency() {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDialogOpen(false)}>{t("close")}</Button>
+        </DialogActions>
+      </Dialog>
+      {/* attachment */}
+      <Dialog
+        open={attachmentsDialogOpen}
+        onClose={() => setAttachmentsDialogOpen(false)}
+        fullWidth
+      >
+        <DialogTitle>{t("attachments")}</DialogTitle>
+        <DialogContent>
+          {attachmentsLoading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} height={50} sx={{ mb: 1 }} />
+            ))
+          ) : attachments.length > 0 ? (
+            attachments.map((att) => (
+              <Box
+                key={att.id}
+                mb={2}
+                p={2}
+                borderRadius={2}
+                bgcolor={
+                  att.sender_type === "lawyer" ? "#e8f5e9" : "#e3f2fd" // لون مختلف للمحامي
+                }
+              >
+                <Typography variant="body2" fontWeight={600}>
+                  {att.sender_type === "lawyer"
+                    ? t("lawyer_attachment")
+                    : t("user_attachment")}
+                </Typography>
+                <Typography variant="body1" mb={1}>
+                  {att.file_name.split("/").pop()} (
+                  {att.file_type.toUpperCase()})
+                </Typography>
+                <Box display="flex" justifyContent="space-between" mt={1}>
+                  <Button
+                    href={`${import.meta.env.VITE_API_URL_IMAGE}${att.file_name}`}
+                    target="_blank"
+                    variant="contained"
+                    color="primary"
+                    // download={true}
+                  >
+                    {t("open")}
+                  </Button>
+                  <IconButton
+                    color="error"
+                    onClick={() => handleDeleteAttachment(att.id)}
+                    size="small"
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+                <Typography
+                  variant="caption"
+                  color="textSecondary"
+                  display="block"
+                  mt={1}
+                >
+                  {t("uploaded_at")}:{" "}
+                  {new Date(att.created_at).toLocaleString()}
+                </Typography>
+              </Box>
+            ))
+          ) : (
+            <Typography>{t("no_attachments_available")}</Typography>
+          )}
+          <Box mt={3}>
+            <TextField
+              fullWidth
+              type="file"
+              inputProps={{ accept: "application/pdf,image/*" }}
+              onChange={(e) => setNewAttachment(e.target.files[0])}
+              label={t("add_new_attachment")}
+              variant="outlined"
+              size="small"
+            />
+            <Box display="flex" justifyContent="flex-end" mt={1}>
+              <Button
+                startIcon={<AddIcon />}
+                onClick={handleAddAttachment}
+                color="primary"
+              >
+                {t("add_attachment")}
+              </Button>
+            </Box>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setAttachmentsDialogOpen(false)}>
+            {t("close")}
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>
