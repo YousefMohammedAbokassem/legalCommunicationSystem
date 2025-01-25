@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import {
   Box,
@@ -11,10 +11,12 @@ import {
   Divider,
   TextField,
   IconButton,
+  Skeleton,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import { styled } from "@mui/system";
 import Pusher from "pusher-js";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const ChatContainer = styled(Box)({
   display: "grid",
@@ -53,13 +55,52 @@ export default function Chats() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingCon, setLoadingCon] = useState(false);
   const [selectedLawyer, setSelectedLawyer] = useState(null);
-  const lawyers = [
-    { id: 78, name: "Lawyer A" },
-    { id: 2, name: "Lawyer B" },
-    { id: 3, name: "Lawyer C" },
-  ];
+  const [lawyers, setLawyers] = useState([]);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const handleSelectLawyer = (lawyer) => {
+    setSelectedLawyer(lawyer);
+    navigate(`?id=${lawyer.id}`);
+  };
+  // fetch all chats areas
+  useEffect(() => {
+    const fetchChats = async () => {
+      try {
+        setLoadingCon(true);
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}v1/chats`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        });
+        // let fetchChats = {
+        //   name: localStorage.getItem("user")
+        //     ? res.data.messages?.lawyer_name
+        //     : res.data.messages?.user_name,
+        //   id: res.data.messages.id,
+        // };
+        const fetchChats = res.data.conversations.map((msg) => ({
+          name:
+            localStorage.getItem("role") === "user"
+              ? msg?.lawyer_name
+              : msg?.user_name,
+          avatar:
+            localStorage.getItem("role") === "user"
+              ? msg?.lawyer_avatar
+              : msg?.user_avatar,
+          id: msg.id,
+        }));
+        setLawyers(fetchChats);
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+      } finally {
+        setLoadingCon(false);
+      }
+    };
 
+    fetchChats();
+  }, []);
   // Fetch messages from API
   useEffect(() => {
     if (!selectedLawyer) return;
@@ -78,7 +119,7 @@ export default function Chats() {
 
         // تحويل الرسائل إلى الشكل المطلوب
         const fetchedMessages = res.data.messages.map((msg) => ({
-          id: msg.id,
+          // id: msg.id,
           text: msg.content,
           sender: msg?.sender,
         }));
@@ -93,7 +134,17 @@ export default function Chats() {
 
     fetchMessages();
   }, [selectedLawyer]);
+
   useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const id = queryParams.get("id");
+
+    if (id) {
+      const lawyer = lawyers.find((l) => l.id === parseInt(id));
+      if (lawyer) {
+        setSelectedLawyer(lawyer);
+      }
+    }
     // استرجاع الـ token من الـ localStorage
     let accessToken = localStorage.getItem("access_token");
 
@@ -122,10 +173,10 @@ export default function Chats() {
     });
 
     // الاشتراك في القنوات مباشرة بدون متغيرات
-    pusher.subscribe("conversation_78").bind("message.sent", (data) => {
+    pusher.subscribe(`conversation_${id}`).bind("message.sent", (data) => {
       console.log("New message received from message.sent channel: ", data);
       const newMessageObj = {
-        id: data.id,
+        // id: data.id,
         text: data.message,
         sender: data.sender,
       };
@@ -163,16 +214,32 @@ export default function Chats() {
       .bind("new_notification", (data) => {
         console.log("New notification from lawyer to user: ", data);
       });
-
+    console.log("first");
     // تنظيف عند مغادرة المكون
     return () => {
       pusher.unsubscribe("message.sent");
-      pusher.unsubscribe("conversation_78");
+      pusher.unsubscribe(`conversation_${id}`);
       pusher.unsubscribe("send.notification.from.user.to.lawyer");
       pusher.unsubscribe("send.notification.from.representative.to.lawyer");
       pusher.unsubscribe("send.notification.from.representative.to.user");
       pusher.unsubscribe("send.notification.from.lawyer.to.representative");
       pusher.unsubscribe("send.notification.from.lawyer.to.user");
+    };
+  }, [location.search, lawyers]);
+  const [footerHeight, setFooterHeight] = useState(
+    document.querySelector("footer")?.offsetHeight
+  );
+  const [headerHeight, setHeaderHeight] = useState(
+    document.querySelector("header")?.offsetHeight
+  );
+  // const [chatArea, setChatArea] = useState();
+  useEffect(() => {
+    const footer = document.querySelector("footer") as HTMLElement;
+    const header = document.querySelector("header");
+    setHeaderHeight(header?.offsetHeight);
+    setFooterHeight(footer.offsetHeight);
+    window.onresize = () => {
+      setFooterHeight(footer.offsetHeight);
     };
   }, []);
   // Handle sending a new message
@@ -208,7 +275,19 @@ export default function Chats() {
       }
     }
   };
-  console.log(messages);
+  const messagesEndRef = useRef(null);
+
+  // Scroll to bottom function
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  // Use effect to scroll when messages change
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
   return (
     <ChatContainer>
       {/* Chat List */}
@@ -217,37 +296,90 @@ export default function Chats() {
           Conversations
         </Typography>
         <Divider />
-        <List>
-          {lawyers.map((lawyer) => (
-            <ListItem
-              button
-              key={lawyer.id}
-              onClick={() => setSelectedLawyer(lawyer)}
-              selected={selectedLawyer?.id === lawyer.id}
-            >
-              <ListItemAvatar>
-                <Avatar>{lawyer.name[0]}</Avatar>
-              </ListItemAvatar>
-              <ListItemText
-                primary={lawyer.name}
-                secondary={
-                  selectedLawyer?.id === lawyer.id
-                    ? "Currently viewing"
-                    : "Click to view messages"
-                }
-              />
-            </ListItem>
-          ))}
-        </List>
+        {loadingCon ? (
+          <List>
+            {Array.from({ length: 5 }).map((_, index) => (
+              <ListItem key={index}>
+                <ListItemAvatar>
+                  <Skeleton variant="circular" width={40} height={40} />
+                </ListItemAvatar>
+                <ListItemText
+                  primary={<Skeleton variant="text" width="60%" />}
+                  secondary={<Skeleton variant="text" width="40%" />}
+                />
+              </ListItem>
+            ))}
+          </List>
+        ) : (
+          <List>
+            {lawyers.map((lawyer) => (
+              <ListItem
+                button
+                key={lawyer.id}
+                onClick={() => handleSelectLawyer(lawyer)}
+                selected={selectedLawyer?.id === lawyer.id}
+                sx={{
+                  cursor: "pointer",
+                  bgcolor: `${selectedLawyer?.id === lawyer.id ? "#f9f9f9" : ""}`,
+                }}
+              >
+                <ListItemAvatar>
+                  <Avatar
+                    src={`${import.meta.env.VITE_API_URL_IMAGE}${lawyer.avatar}`}
+                    alt={lawyer.name}
+                  >
+                    {!lawyer?.avatar && lawyer.name[0]}
+                  </Avatar>
+                </ListItemAvatar>
+                <ListItemText
+                  primary={lawyer.name}
+                  secondary={
+                    selectedLawyer?.id === lawyer.id
+                      ? "Currently viewing"
+                      : "Click to view messages"
+                  }
+                />
+              </ListItem>
+            ))}
+          </List>
+        )}
       </ChatList>
 
       {/* Chat Area */}
-      <ChatArea>
+      <ChatArea
+        sx={{
+          height: `calc(${document.documentElement.scrollHeight}px - ${headerHeight}px - ${footerHeight}px)`,
+        }}
+        className="chatArea"
+      >
         {selectedLawyer ? (
           <>
             <MessagesArea>
               {loading ? (
-                <Typography>Loading messages...</Typography>
+                <Box>
+                  {Array.from({ length: 7 }).map((_, index) => (
+                    <Box
+                      key={index}
+                      display="flex"
+                      justifyContent={
+                        index % 2 === 0 ? "flex-end" : "flex-start"
+                      }
+                      mb={2}
+                    >
+                      <Box
+                        p={2}
+                        borderRadius={4}
+                        width={100}
+                        height={40}
+                        bgcolor={index % 2 === 0 ? "#5c7c93" : "#e0e0e0"}
+                        color={index % 2 === 0 ? "#fff" : "#000"}
+                        maxWidth="60%"
+                      >
+                        {/* <Skeleton variant="text" width="100%" height={20} /> */}
+                      </Box>
+                    </Box>
+                  ))}
+                </Box>
               ) : (
                 messages.map((message) => (
                   <Box
@@ -262,7 +394,7 @@ export default function Chats() {
                   >
                     <Box
                       p={2}
-                      borderRadius={8}
+                      borderRadius={4}
                       bgcolor={
                         message.sender === localStorage.getItem("role")
                           ? "#5c7c93"

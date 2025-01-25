@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -59,6 +59,15 @@ export default function CustomNavBar() {
     }
     setSnackbarOpen(false);
   };
+  const audioRef = useRef(null);
+
+  const playNotificationSound = () => {
+    if (audioRef.current) {
+      audioRef.current.play().catch((err) => {
+        console.error("Error playing audio:", err);
+      });
+    }
+  };
   useEffect(() => {
     // استرجاع الـ token من الـ localStorage
     let accessToken = localStorage.getItem("access_token");
@@ -86,67 +95,90 @@ export default function CustomNavBar() {
     pusher.connection.bind("error", (err) => {
       console.error("Pusher connection error:", err);
     });
+    // if (localStorage.getItem("role") === "lawyer") {
+    console.log("uuuuuuuuuu");
 
-    // الاشتراك في القنوات مباشرة بدون متغيرات
-    console.log({ profileData });
     pusher
       .subscribe(`lawyer_notifications_${profileData?.id}`)
       .bind("send.notification.from.user.to.lawyer", (data) => {
-        console.log("New message received from message.sent channel: ", data);
+        playNotificationSound();
         setDataNotification(data);
         setSnackbarOpen(true);
         const newMessageObj = {
           agency_id: data.id,
-          msg: data.message,
+          msg: data.body,
         };
 
         setNotifications((prevMessages) => [...prevMessages, newMessageObj]);
         // alert(`New message: ${data}`); // يمكن إضافة رسالة منبثقة للاختبار
       });
     pusher
-      .subscribe(`lawyer_notifications_${profileData?.id}`)
+      .subscribe(`representative_notifications_${profileData?.id}`)
       .bind("send.notification.from.representative.to.lawyer", (data) => {
-        console.log("New message received from message.sent channel: ", data);
+        playNotificationSound();
+
         setDataNotification(data);
         setSnackbarOpen(true);
         const newMessageObj = {
           agency_id: data.id,
-          msg: data.message,
+          msg: data.body,
         };
 
         setNotifications((prevMessages) => [...prevMessages, newMessageObj]);
         // alert(`New message: ${data}`); // يمكن إضافة رسالة منبثقة للاختبار
       });
+    // }
+
+    // if (localStorage.getItem("role") === "user") {
 
     pusher
-      .subscribe("send.notification.from.user.to.lawyer")
-      .bind("new_notification", (data) => {
-        console.log("New notification from user to lawyer: ", data);
-      });
+      .subscribe(`user_notifications_${profileData?.id}`)
+      .bind("send.notification.from.lawyer.to.user", (data) => {
+        playNotificationSound();
 
-    pusher
-      .subscribe("send.notification.from.representative.to.lawyer")
-      .bind("new_notification", (data) => {
-        console.log("New notification from representative to lawyer: ", data);
-      });
+        setDataNotification(data);
+        setSnackbarOpen(true);
+        const newMessageObj = {
+          agency_id: data.id,
+          msg: data.body,
+        };
 
-    pusher
-      .subscribe("send.notification.from.representative.to.user")
-      .bind("new_notification", (data) => {
-        console.log("New notification from representative to user: ", data);
+        setNotifications((prevMessages) => [...prevMessages, newMessageObj]);
+        // alert(`New message: ${data}`); // يمكن إضافة رسالة منبثقة للاختبار
       });
+    pusher
+      .subscribe(`user_notifications_${profileData?.id}`)
+      .bind("send.notification.from.representative.to.user", (data) => {
+        playNotificationSound();
 
-    pusher
-      .subscribe("send.notification.from.lawyer.to.representative")
-      .bind("new_notification", (data) => {
-        console.log("New notification from lawyer to representative: ", data);
-      });
+        setDataNotification(data);
+        setSnackbarOpen(true);
+        const newMessageObj = {
+          agency_id: data.id,
+          msg: data.body,
+        };
 
-    pusher
-      .subscribe("send.notification.from.lawyer.to.user")
-      .bind("new_notification", (data) => {
-        console.log("New notification from lawyer to user: ", data);
+        setNotifications((prevMessages) => [...prevMessages, newMessageObj]);
+        // alert(`New message: ${data}`); // يمكن إضافة رسالة منبثقة للاختبار
       });
+    // }
+    // if (localStorage.getItem("role") === "representative") {
+    pusher
+      .subscribe(`representative_notifications_${profileData?.id}`)
+      .bind("send.notification.from.lawyer.to.representative'", (data) => {
+        playNotificationSound();
+
+        setDataNotification(data);
+        setSnackbarOpen(true);
+        const newMessageObj = {
+          agency_id: data.id,
+          msg: data.body,
+        };
+
+        setNotifications((prevMessages) => [...prevMessages, newMessageObj]);
+        // alert(`New message: ${data}`); // يمكن إضافة رسالة منبثقة للاختبار
+      });
+    // }
 
     // تنظيف عند مغادرة المكون
     return () => {
@@ -259,6 +291,7 @@ export default function CustomNavBar() {
         }
       );
       setNotifications(res.data.notifications || []);
+      console.log(res.data.notifications);
     } catch (error) {
       console.error("Error fetching notifications:", error);
     } finally {
@@ -290,8 +323,63 @@ export default function CustomNavBar() {
       setDialogOpen(false);
     }
   };
+  // States for Dialog
+  const [openDialog, setOpenDialog] = useState(false);
+  const [formDataContainer, setFormDataContainer] = useState({
+    name: "",
+    address: "",
+    birthday: "",
+    birth_place: "",
+    phone: "",
+    imageUpload: null,
+  });
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormDataContainer((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = (e) => {
+    setFormDataContainer((prev) => ({
+      ...prev,
+      imageUpload: e.target.files[0],
+    }));
+  };
+
+  const changeInfo = async () => {
+    const formDataToSend = new FormData();
+    formDataToSend.append("name", formDataContainer.name);
+    formDataToSend.append("address", formDataContainer.address);
+    formDataToSend.append("birth_place", formDataContainer.birth_place);
+    formDataToSend.append("phone", formDataContainer.phone);
+    console.log(formDataContainer.imageUpload);
+    formDataToSend.append("avatar", formDataContainer.imageUpload);
+
+    try {
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_URL}v1/${localStorage.getItem("role")}s/update-info`,
+        {
+          name: formDataContainer.name,
+          address: formDataContainer.address,
+          birth_place: formDataContainer.birth_place,
+          phone: formDataContainer.phone,
+          imageUpload: formDataContainer.imageUpload,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+      console.log("Response:", response.data);
+      setOpenDialog(false); // Close dialog after successful submission
+    } catch (error) {
+      console.error("Error updating info:", error);
+    }
+  };
+
   return (
     <Box sx={{ flexGrow: 1 }}>
+      <audio ref={audioRef} src="/message.mp3" />
       <AppBar
         position="static"
         sx={{
@@ -418,7 +506,10 @@ export default function CustomNavBar() {
                       }}
                     >
                       {index + 1}
-                      {"  "} : <ListItemText primary={notification?.msg} />
+                      {"  "} :{" "}
+                      <ListItemText
+                        primary={`${notification?.title}:${notification?.body}`}
+                      />
                     </ListItem>
                   ))}
                 </List>
@@ -487,6 +578,12 @@ export default function CustomNavBar() {
         >
           Change Password
         </MenuItem>
+        <MenuItem
+          onClick={() => setOpenDialog(true)}
+          sx={{ display: "flex", justifyContent: "center" }}
+        >
+          Change Info
+        </MenuItem>
         <MenuItem>
           <Button
             variant="outlined"
@@ -513,6 +610,64 @@ export default function CustomNavBar() {
             Delete Account
           </Button>
         </MenuItem>
+        {/* Dialog for editing information */}
+        <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+          <DialogTitle>Update Information</DialogTitle>
+          <DialogContent>
+            <TextField
+              fullWidth
+              margin="dense"
+              name="name"
+              label="Name"
+              value={formDataContainer.name}
+              onChange={handleInputChange}
+            />
+            <TextField
+              fullWidth
+              margin="dense"
+              name="address"
+              label="Address"
+              value={formDataContainer.address}
+              onChange={handleInputChange}
+            />
+            <TextField
+              fullWidth
+              margin="dense"
+              name="birthday"
+              label="Birthday"
+              type="date"
+              InputLabelProps={{ shrink: true }}
+              value={formDataContainer.birthday}
+              onChange={handleInputChange}
+            />
+            <TextField
+              fullWidth
+              margin="dense"
+              name="birth_place"
+              label="Birth Place"
+              value={formDataContainer.birth_place}
+              onChange={handleInputChange}
+            />
+            <TextField
+              fullWidth
+              margin="dense"
+              name="phone"
+              label="Phone"
+              value={formDataContainer.phone}
+              onChange={handleInputChange}
+            />
+            <Button variant="contained" component="label" sx={{ mt: 2 }}>
+              Upload Image
+              <input type="file" hidden onChange={handleFileChange} />
+            </Button>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+            <Button onClick={changeInfo} variant="contained" color="primary">
+              Submit
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Popover>
 
       <Drawer
@@ -610,8 +765,8 @@ export default function CustomNavBar() {
       </Dialog>
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={5000}
-        onClose={handleSnackbarClose}
+        autoHideDuration={50000}
+        // onClose={handleSnackbarClose}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         onClick={() => navigate(`/agencies/${dataNotification?.id}`)}
       >
@@ -620,7 +775,7 @@ export default function CustomNavBar() {
           severity="success"
           sx={{ width: "100%" }}
         >
-          {dataNotification?.message}
+          {dataNotification?.body}
         </Alert>
       </Snackbar>
     </Box>
