@@ -30,26 +30,25 @@ import { useNavigate, Link } from "react-router-dom";
 import Pusher from "pusher-js";
 
 export default function CustomNavBar() {
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const [loadingSignOut, setLoadingSignOut] = useState(false);
-  const [loadingDelete, setLoadingDelete] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [loadingChange, setLoadingChange] = useState(false);
-  const [loadProfile, setLoadProfile] = useState(false);
-  const [profileData, setProfileData] = useState([]);
-  const [notificationAnchorEl, setNotificationAnchorEl] =
-    useState<HTMLElement | null>(null);
-  const [notifications, setNotifications] = useState<string[]>([]);
-  const [loadingNotifications, setLoadingNotifications] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<any>(null);
+  const [loadingSignOut, setLoadingSignOut] = useState<any>(false);
+  const [loadingDelete, setLoadingDelete] = useState<any>(false);
+  const [drawerOpen, setDrawerOpen] = useState<any>(false);
+  const [dialogOpen, setDialogOpen] = useState<any>(false);
+  const [currentPassword, setCurrentPassword] = useState<any>("");
+  const [newPassword, setNewPassword] = useState<any>("");
+  const [confirmPassword, setConfirmPassword] = useState<any>("");
+  const [loadingChange, setLoadingChange] = useState<any>(false);
+  const [loadProfile, setLoadProfile] = useState<any>(false);
+  const [profileData, setProfileData] = useState<any>([]);
+  const [notificationAnchorEl, setNotificationAnchorEl] = useState<any>(null);
+  const [notifications, setNotifications] = useState<any>([]);
+  const [loadingNotifications, setLoadingNotifications] = useState<any>(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [dataNotification, setDataNotification] = useState({});
+  const [dataNotification, setDataNotification] = useState<any>({});
   const handleSnackbarClose = (
     event?: React.SyntheticEvent | Event,
     reason?: string
@@ -59,11 +58,11 @@ export default function CustomNavBar() {
     }
     setSnackbarOpen(false);
   };
-  const audioRef = useRef(null);
+  const audioRef = useRef<any>(null);
 
   const playNotificationSound = () => {
     if (audioRef.current) {
-      audioRef.current.play().catch((err) => {
+      audioRef.current.play().catch((err: any) => {
         console.error("Error playing audio:", err);
       });
     }
@@ -92,7 +91,7 @@ export default function CustomNavBar() {
       console.log("Connected to Pusher!");
     });
 
-    pusher.connection.bind("error", (err) => {
+    pusher.connection.bind("error", (err: any) => {
       console.error("Pusher connection error:", err);
     });
     // if (localStorage.getItem("role") === "lawyer") {
@@ -143,7 +142,10 @@ export default function CustomNavBar() {
           msg: data.body,
         };
 
-        setNotifications((prevMessages) => [...prevMessages, newMessageObj]);
+        setNotifications((prevMessages: any) => [
+          ...prevMessages,
+          newMessageObj,
+        ]);
         // alert(`New message: ${data}`); // يمكن إضافة رسالة منبثقة للاختبار
       });
     pusher
@@ -262,6 +264,7 @@ export default function CustomNavBar() {
         }
       );
       setProfileData(res?.data?.profile);
+      console.log(res);
     } catch (error) {
       console.error(error);
       if (axios.isAxiosError(error) && error.response?.status === 401) {

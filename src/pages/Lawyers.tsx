@@ -45,6 +45,7 @@ export default function Lawyers() {
       const newLawyers = res?.data?.lawyers || [];
       setLawyers((prev) => [...prev, ...newLawyers]); // Append new data
       setHasMore(newLawyers.length > 0); // Stop if no more data
+      console.log(res.data);
     } catch (error) {
       console.log(error);
     } finally {

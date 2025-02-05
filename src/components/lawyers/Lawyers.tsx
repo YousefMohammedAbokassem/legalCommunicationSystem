@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
@@ -7,6 +7,7 @@ import { HeaderSection } from "../headerSection/HeaderSection";
 import { useTranslation } from "react-i18next";
 import Rating from "@mui/material/Rating"; // استيراد Rating من MUI
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const ReviewSection = () => {
   const navigate = useNavigate();
@@ -20,8 +21,34 @@ const ReviewSection = () => {
     target.style.setProperty("--x", `${distanceX}px`);
     target.style.setProperty("--y", `${distanceY}px`);
   };
-
+  const [lawyers, setLawyers] = useState<any>([]);
+  const [loading, setLoading] = useState(false);
+  const fetchLawyerss = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `http://mohammadkheryadj-64003.portmap.host:64003/get_recommanded`
+        // {
+        //   headers: {
+        //     Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        //   },
+        // }
+      );
+      const newLawyers = res?.data?.lawyers || [];
+      setLawyers((prev: any) => [...prev, ...newLawyers]); // Append new data
+      // setHasMore(newLawyers.length > 0); // Stop if no more data
+      console.log(res.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  console.log(lawyers);
   const [t] = useTranslation();
+  useEffect(() => {
+    fetchLawyerss();
+  }, []);
   return (
     <div className="py-8 container mx-auto">
       <HeaderSection text={t("review")} />
@@ -85,10 +112,9 @@ const ReviewSection = () => {
                 window.scrollTo({
                   top: 0,
                   left: 0,
-                  behavior: 'smooth'
+                  behavior: "smooth",
                 });
               }}
-              
             >
               {t("pageOfLawer")}
             </button>
