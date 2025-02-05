@@ -29,7 +29,7 @@ export default function Agency() {
   const { id } = useParams();
   const [t] = useTranslation();
   const navigate = useNavigate();
-  const [issue, setIssue] = useState({});
+  const [issue, setIssue] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [notes, setNotes] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -188,7 +188,7 @@ export default function Agency() {
       );
       setAttachments((prev) => [...prev, res.data]);
       setNewAttachment(null);
-      console.log(formData)
+      console.log(formData);
       Swal.fire(t("attachment_added_successfully"), "", "success");
     } catch (error) {
       console.log(error);
@@ -526,7 +526,12 @@ export default function Agency() {
               fullWidth
               type="file"
               inputProps={{ accept: "application/pdf,image/*" }}
-              onChange={(e) => setNewAttachment(e.target.files[0])}
+              // onChange={(e) => setNewAttachment(e.target.files[0])}
+              onChange={(e) =>
+                setNewAttachment(
+                  (e.target as HTMLInputElement).files?.[0] || null
+                )
+              }
               label={t("add_new_attachment")}
               variant="outlined"
               size="small"

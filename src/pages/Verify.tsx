@@ -122,7 +122,7 @@ export default function VerifyCode() {
                 }}
                 value={otp[index]}
                 onChange={(e) => handleChange(e.target.value, index)}
-                onKeyDown={(e) => handleKeyDown(e, index)}
+                onKeyDown={(e: any) => handleKeyDown(e, index)}
                 variant="outlined"
                 sx={{
                   width: "3rem",

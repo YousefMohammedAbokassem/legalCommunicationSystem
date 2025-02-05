@@ -314,10 +314,10 @@ export default function Chats() {
           <List>
             {lawyers.map((lawyer) => (
               <ListItem
-                button
+                component="div"
                 key={lawyer.id}
                 onClick={() => handleSelectLawyer(lawyer)}
-                selected={selectedLawyer?.id === lawyer.id}
+                // selected={selectedLawyer?.id === lawyer.id} seen
                 sx={{
                   cursor: "pointer",
                   bgcolor: `${selectedLawyer?.id === lawyer.id ? "#f9f9f9" : ""}`,

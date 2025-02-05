@@ -22,7 +22,7 @@ import Swal from "sweetalert2";
 
 export default function Lawyer() {
   const { id } = useParams();
-  const [lawyer, setLawyer] = useState([]);
+  const [lawyer, setLawyer] = useState<any>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [hireLoading, setHireLoading] = useState(false);
