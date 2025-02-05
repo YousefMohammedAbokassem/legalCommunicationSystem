@@ -10,7 +10,7 @@ import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import { useTranslation } from "react-i18next";
 
-export default function Option() {
+export default function Option({mode,setMode}) {
   const [t] = useTranslation();
   const [alignment, setAlignment] = React.useState("left");
   const handleChange = (

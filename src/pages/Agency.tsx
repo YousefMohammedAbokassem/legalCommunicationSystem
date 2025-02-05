@@ -50,7 +50,7 @@ export default function Agency() {
   const { id } = useParams();
   const [t] = useTranslation();
   const navigate = useNavigate();
-  const [agency, setAgency] = useState({});
+  const [agency, setAgency] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [hireLoading, setHireLoading] = useState(false);

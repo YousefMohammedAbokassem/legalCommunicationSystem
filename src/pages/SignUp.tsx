@@ -15,7 +15,7 @@ import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { stateRedux } from "../types";
 import { useTranslation } from "react-i18next";
-import Tsparticles from "../components/Log/tsparticles";
+// import Tsparticles from "../components/Log/tsparticles";
 
 import axios from "axios";
 import { logIn } from "../store/slices/auth/authSlice";

@@ -13,7 +13,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import { useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
-import Tsparticles from "../components/Log/tsparticles";
+// import Tsparticles from "../components/Log/tsparticles";
 import axios from "axios";
 import { logIn } from "../store/slices/auth/authSlice";
 import { useNavigate } from "react-router-dom";
