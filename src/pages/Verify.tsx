@@ -82,7 +82,7 @@ export default function VerifyCode() {
 
       localStorage.removeItem("email");
     } catch (error: any) {
-      setError("incorrect" || "An error occurred.");
+      setError(error?.response?.data?.message || "An error occurred.");
       setProgressVerify(false);
     }
   };
